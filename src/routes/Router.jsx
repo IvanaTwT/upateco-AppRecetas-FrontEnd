@@ -26,11 +26,13 @@ const Router = createBrowserRouter([
             },
             {
                 path: "/contact",
-                element: <Contact />,
+                element: (<ProtectedRoute>
+                            <Contact />
+                        </ProtectedRoute>)
             },
             {
                 path: "*",
-                element: <h1>Not Found</h1>,
+                element: <h1 className="title is-3">Not Found</h1>,
             },
         ],
     },

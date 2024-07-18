@@ -87,7 +87,7 @@ function Login() {
                                 {isLoading && triggerFetch && (
                                     <p>Cargando...</p>
                                 )}
-                                {isError && <p>Error al cargar los datos.</p>}
+                                {isError && <p>Usuario o contraseña incorrectos</p>}
                                 {data && (
                                     <p>{`Token obtenido: ${data.token}`}</p>
                                 )}
