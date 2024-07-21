@@ -40,7 +40,7 @@ const Router = createBrowserRouter([
                     },
                     {
                         path: "edit/:id",
-                        element: <RecetaForm />,
+                        element:<RecetaForm />,
                     },
                 ]
             },

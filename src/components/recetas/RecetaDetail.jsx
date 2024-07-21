@@ -1,11 +1,13 @@
 import useFetch from "../hooks/useFetch";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams , NavLink} from "react-router-dom";
 import { formatDate } from "../hooks/utils";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function RecetaDetail() {
     const { id } = useParams();
 
+    const { isAuthenticated, token } = useAuth("state");
     const [{ data, isError, isLoading }, doFetch] = useFetch(
         "https://sandbox.academiadevelopers.com/reciperover/recipes/",
         {}
@@ -34,11 +36,24 @@ export default function RecetaDetail() {
                 </div>
                 <div className="card-content">
                     <div className="media">
-                        <div className="media-content">
-                            <p className="subtitle is-6">Vistas: {receta.view_count}</p>
-                            <h2 className="title is-3">{receta.title}</h2>
+                        <div className="media-content is-flex is-flex-direction-column is-justify-content-center is-align-items-start">
+                            <p className="subtitle is-6 is-align-self-baseline">Vistas: {receta.view_count}</p>
+                            <h2 className="title is-3 ">{receta.title}</h2>
                         </div>
+                        { isAuthenticated ? 
+                            (
+                        <div className="media-right is-flex is-align-items-center">
+                                <div className="buttons-container is-flex">
+                                     <NavLink to={`../edit/${id}`} relative="path"><button className="button is-light"><ion-icon name="create-outline"></ion-icon></button></NavLink>
+                                    
+                                     <NavLink to={`../`} relative="path"><button className="button is-danger"><ion-icon name="trash-outline"></ion-icon></button></NavLink>
+                                </div>
+                        </div>) : null
+                        }
                     </div>
+
+                    
+
                     <div className="content">
                         <p>{receta.description}</p>
                         <br />
