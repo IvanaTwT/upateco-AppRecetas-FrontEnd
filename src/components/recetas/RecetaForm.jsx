@@ -7,15 +7,12 @@ export default function RecetaForm() {
   const { id } = useParams();
 
   const { isAuthenticated, token } = useAuth("state");
-  console.log(
-    "RecipeForm Autorizado: " + isAuthenticated,
-    " - Token: " + token
-  );
+  console.log("Autenticado: "+isAuthenticated)
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [preparation_time, setPreparationTime] = useState("");
-  const [cooking_time, setCookingTime] = useState("");
-  const [servings, setServings] = useState("");
+  const [preparation_time, setPreparationTime] = useState(null);
+  const [cooking_time, setCookingTime] = useState(null);
+  const [servings, setServings] = useState(null);
   const [image, setImage] = useState("");
   const [formCargado, setFormCargado]= useState(false);
   // const [ingredients, setIngredients] = useState(""); array
@@ -31,52 +28,69 @@ export default function RecetaForm() {
     doFetch();
   }, []);
 
+
+  //   modificar receta
+  const [{ isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
+    `https://sandbox.academiadevelopers.com/reciperover/recipes/${id}`,
+    {
+      method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${token}`,
+    },
+  }
+  );
+  
+  // use effect para los datos del formulario
+  useEffect(() => {
+    if (formCargado) {
+      const nuevoObjeto = {
+        "title":title,
+        "description":description,
+        "preparation_time":preparation_time,
+        "cooking_time":cooking_time,
+        "servings":servings,
+        "image":image,
+      };
+      // for (const key in nuevoObjeto) {
+      //   console.log(key+":"+nuevoObjeto[key])
+      // }
+      // haciendo uso del primero fetch modificando accion
+      doFetchPut({
+        body: JSON.stringify(nuevoObjeto),
+      });
+      setFormCargado(false);
+    }
+  }, [formCargado, doFetchPut, title, description, preparation_time, cooking_time, servings, image]);
+
+
+// efecto para cuando haya algo en data
+  useEffect(() => {
+    if (data && window.location.pathname != "/recetas/new") {
+      // console.log(window.location.pathname);
+      setTitle(receta.title);
+      setDescription(receta.description);
+      setPreparationTime(receta.preparation_time);
+      setCookingTime(receta.cooking_time);
+      setServings(receta.servings);
+      setImage(receta.image);
+      // console.log(data)//[{…}, {…}]
+    }
+  }, [data]);
+
+
   if (isLoading) return <p>Cargando...</p>;
   if (isError) return <p>Error al cargar las recetas.</p>;
   if (!data) return <p>No hay recetas disponibles</p>;
 
   const [receta] = data.filter((receta) => receta.id === parseInt(id));
-//   modificar receta
-// if(formCargado){
-//   const [{ data2, isError2, isLoading2 }, doFetch2] = useFetch(
-//     `https://sandbox.academiadevelopers.com/reciperover/recipes/${id}/`,
-//     {
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `${token}`,
-//       },
-//       body: JSON.stringify(nuevoObjeto)
-//     }
-//   );
-//   useEffect(()=>{
-//         doFetch2();
-//       }, []);
-//   console.log("Error: ",isError)
-//   console.log(nuevoObjeto+"-"+token)
-// }
 
-  var nuevoObjeto ;
   function handleSubmit(event) {
     event.preventDefault();
-    
-    let recipeEdit = {
-      title: title,
-      description: description,
-      preparation_time: preparation_time,
-      cooking_time: cooking_time,
-      image: image,
-      servings: servings,
-    };
-    
-    nuevoObjeto = Object.fromEntries(
-      Object.entries(recipeEdit).filter(([clave, valor]) => valor !== "")
-    );
     setFormCargado(true)
 
   }
   
- 
   function handleChange(e) {
     switch (e.target.name) {
       case "title":
@@ -115,7 +129,7 @@ export default function RecetaForm() {
                   type="text"
                   id="title"
                   name="title"
-                  defaultValue={receta ? receta.title : title}
+                  defaultValue={title}
                   onChange={handleChange}
                   required
                 />
@@ -133,9 +147,7 @@ export default function RecetaForm() {
                   rows={3}
                   id="preparation_time"
                   name="preparation_time"
-                  defaultValue={
-                    receta ? receta.preparation_time : preparation_time
-                  }
+                  defaultValue={preparation_time}
                   onChange={handleChange}
                 />
               </div>
@@ -150,7 +162,7 @@ export default function RecetaForm() {
                   rows={3}
                   id="cooking_time"
                   name="cooking_time"
-                  defaultValue={receta ? receta.cooking_time : cooking_time}
+                  defaultValue={cooking_time}
                   onChange={handleChange}
                 />
               </div>
@@ -163,7 +175,7 @@ export default function RecetaForm() {
                   className="textarea"
                   id="description"
                   name="description"
-                  defaultValue={receta ? receta.description : description}
+                  defaultValue={description}
                   onChange={handleChange}
                 />
               </div>
@@ -177,7 +189,7 @@ export default function RecetaForm() {
                   type="number"
                   id="servings"
                   name="servings"
-                  defaultValue={receta ? receta.servings : servings}
+                  defaultValue={servings}
                   onChange={handleChange}
                 />
               </div>
@@ -186,9 +198,9 @@ export default function RecetaForm() {
             <div className="card-image">
               <img
                 src={
-                  receta ? (receta.image != null ? receta.image : image) : ""
+                  image
                 }
-                alt={receta ? receta.title : title}
+                alt={title}
               />
             </div>
 
@@ -201,7 +213,7 @@ export default function RecetaForm() {
                   rows={3}
                   id="image"
                   name="image"
-                  defaultValue={receta ? receta.image : image}
+                  defaultValue={image}
                   // value={image}
                   onChange={handleChange}
                 />
