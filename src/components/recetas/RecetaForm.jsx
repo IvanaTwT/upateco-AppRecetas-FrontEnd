@@ -7,17 +7,17 @@ export default function RecetaForm() {
   const { id } = useParams();
 
   const { isAuthenticated, token } = useAuth("state");
-  console.log("Autenticado: "+isAuthenticated)
+  // console.log("Autenticado: "+isAuthenticated)
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [preparation_time, setPreparationTime] = useState(null);
   const [cooking_time, setCookingTime] = useState(null);
   const [servings, setServings] = useState(null);
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [formCargado, setFormCargado]= useState(false);
-  // const [ingredients, setIngredients] = useState(""); array
-  //   const [locations, setLocations] = useState("");  array
-  //   const [categories, setCategories] = useState(""); array
+  const [ingredients, setIngredients] = useState(""); //array
+  const [locations, setLocations] = useState("");  //array
+  const [categories, setCategories] = useState(""); //array
 
   const [{ data, isError, isLoading }, doFetch] = useFetch(
     "https://sandbox.academiadevelopers.com/reciperover/recipes/",
@@ -30,17 +30,16 @@ export default function RecetaForm() {
 
 
   //   modificar receta
-  const [{ isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
+  const [{ dataPut, isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
     `https://sandbox.academiadevelopers.com/reciperover/recipes/${id}`,
     {
       method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `${token}`,
+      Authorization: `Token ${token}`,
     },
   }
   );
-  
   // use effect para los datos del formulario
   useEffect(() => {
     if (formCargado) {
@@ -52,16 +51,16 @@ export default function RecetaForm() {
         "servings":servings,
         "image":image,
       };
-      // for (const key in nuevoObjeto) {
-      //   console.log(key+":"+nuevoObjeto[key])
-      // }
-      // haciendo uso del primero fetch modificando accion
+      console.log(nuevoObjeto)
+      // Petición PUT
       doFetchPut({
         body: JSON.stringify(nuevoObjeto),
-      });
+      })
+      // console.log("Data:"+dataPut)
+      // console.log('Error:', isErrorPut)
       setFormCargado(false);
     }
-  }, [formCargado, doFetchPut, title, description, preparation_time, cooking_time, servings, image]);
+  }, [formCargado, title, description, preparation_time, cooking_time, servings, image]);
 
 
 // efecto para cuando haya algo en data
@@ -90,7 +89,7 @@ export default function RecetaForm() {
     setFormCargado(true)
 
   }
-  
+
   function handleChange(e) {
     switch (e.target.name) {
       case "title":
@@ -121,6 +120,30 @@ export default function RecetaForm() {
       <div className="columns is-centered">
         <div className="column is-4">
           <form onSubmit={handleSubmit}>
+          <div className="card-image">
+              <img
+                src={
+                  image
+                }
+                alt={title}
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="image">Imagen URL:</label>
+              <div className="control">
+                <input
+                  className="input"
+                  type="text"
+                  rows={3}
+                  id="image"
+                  name="image"
+                  defaultValue={image}
+                  // value={image}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
             <div className="field">
               <label htmlFor="title">Nombre receta: (*)</label>
               <div className="control">
@@ -195,30 +218,7 @@ export default function RecetaForm() {
               </div>
             </div>
             {/* {if ()} */}
-            <div className="card-image">
-              <img
-                src={
-                  image
-                }
-                alt={title}
-              />
-            </div>
 
-            <div className="field">
-              <label htmlFor="image">Imagen URL:</label>
-              <div className="control">
-                <input
-                  className="input"
-                  type="text"
-                  rows={3}
-                  id="image"
-                  name="image"
-                  defaultValue={image}
-                  // value={image}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
 
             <div className="field">
               <div className="control">
