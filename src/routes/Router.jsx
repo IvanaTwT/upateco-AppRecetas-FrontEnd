@@ -22,9 +22,6 @@ const Router = createBrowserRouter([
             },
             {
                 path: "/recetas",
-                // element: (<ProtectedRoute>
-                //           <Recetas/>
-                //       </ProtectedRoute>),
                 children: [
                     {
                         index: true,
@@ -36,19 +33,23 @@ const Router = createBrowserRouter([
                     },
                     {
                         path: "new",
-                        element: <RecetaForm />,
+                        element: (
+                            <ProtectedRoute>
+                                <RecetaForm />
+                            </ProtectedRoute>),
                     },
                     {
                         path: "edit/:id",
-                        element:<RecetaForm />,
+                        element: (
+                            <ProtectedRoute>
+                                <RecetaForm />
+                            </ProtectedRoute>),
                     },
                 ]
             },
             {
                 path: "/contact",
-                element: (<ProtectedRoute>
-                            <Contact />
-                        </ProtectedRoute>)
+                element: <Contact />
             },
             {
                 path: "*",

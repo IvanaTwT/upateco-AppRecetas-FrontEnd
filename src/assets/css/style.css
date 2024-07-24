@@ -18,3 +18,28 @@ strong{
     justify-content: center;
     z-index: 1000;
 }
+
+:root {
+    --bulma-primary-h: 93deg;
+    --bulma-primary-s: 79%;
+    --bulma-primary-l: 61%;
+  }
+  
+  .custom {
+    background-color: hsl(var(--bulma-primary-h), var(--bulma-primary-s), var(--bulma-primary-l));
+    color: white;
+    width: "100%"
+  }
+
+.card-content p {
+    display: flex;
+    align-items: center;
+}
+
+.card-content ion-icon {
+    margin-right: 4px;
+}
+
+.navbar-shadow {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ajusta el valor de la sombra según sea necesario */
+}

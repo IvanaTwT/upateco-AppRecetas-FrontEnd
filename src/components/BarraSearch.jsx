@@ -10,7 +10,6 @@ function BarraSearch() {
             </button>
           </div>
         </div>
-  
     );
   }
   export default BarraSearch;
