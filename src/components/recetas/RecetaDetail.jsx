@@ -64,7 +64,7 @@ export default function RecetaDetail() {
                                         <p className="mr-6"><ion-icon name="time"></ion-icon>Cocción: {receta.cooking_time} mins</p>
                                     </div>
                                     <hr />
-                                    <div class="content">
+                                    <div className="content">
                                         {receta.description}
                                     </div>
 

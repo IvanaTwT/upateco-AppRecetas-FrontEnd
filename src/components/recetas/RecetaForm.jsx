@@ -27,8 +27,17 @@ export default function RecetaForm() {
   useEffect(() => {
     doFetch();
   }, []);
-
-
+  //crear receta
+  const [{ data: dataPost, isError:isErrorPost, isLoading: isLoadingPost }, doFetchPost] = useFetch(
+    "https://sandbox.academiadevelopers.com/reciperover/recipes/",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
+      },
+  }
+  );
   //   modificar receta
   const [{ dataPut, isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
     `https://sandbox.academiadevelopers.com/reciperover/recipes/${id}`,
@@ -53,10 +62,20 @@ export default function RecetaForm() {
       };
       console.log(nuevoObjeto)
       // Petición PUT
-      doFetchPut({
-        body: JSON.stringify(nuevoObjeto),
-      })
-      // console.log("Data:"+dataPut)
+      if(window.location.pathname != "/recetas/new"){
+        console.log("haciendo put...")
+        doFetchPut({
+          body: JSON.stringify(nuevoObjeto),
+        })
+      }else{
+        console.log("haciendo post...")
+        doFetchPost({
+          body: JSON.stringify(nuevoObjeto),
+        })
+        console.log("Data:"+dataPost)
+      }
+      
+    
       // console.log('Error:', isErrorPut)
       setFormCargado(false);
     }
@@ -217,9 +236,6 @@ export default function RecetaForm() {
                 />
               </div>
             </div>
-            {/* {if ()} */}
-
-
             <div className="field">
               <div className="control">
                 <button

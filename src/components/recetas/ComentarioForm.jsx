@@ -29,7 +29,7 @@ export default function ComentarioForm({ recetaId }) {
             parent: null,
         }),
         });
-
+        console.log("Contenido comments: "+content)
         setContent("");
     }
 
