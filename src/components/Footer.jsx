@@ -5,7 +5,7 @@ export default function Footer(){
         <footer className="footer custom">
             <div className="content has-text-centered">
                 <p>
-                <strong>Tus recetas</strong> by <a href="https://gmail.com">tusRecetas@gmail.com</a>.
+                Tus recetas by <a href="https://gmail.com">tusRecetas@gmail.com</a>.
                 </p>
             </div>
         </footer>

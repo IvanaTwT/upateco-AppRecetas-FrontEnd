@@ -9,7 +9,7 @@ export default function Navbar() {
     return (
     <header>
         <nav
-            className={"navbar is-fixed-top custom navbar-shadow"}
+            className={"navbar is-fixed-top custom navbar-shadow is-primary"}
             // role="navigation"
             // aria-label="main navigation"
         >
@@ -20,7 +20,6 @@ export default function Navbar() {
                     className={({ isActive, isPending, isTransitioning }) =>
                     [
                         isPending ? "pending" : "",
-                        isActive ? "has-text-primary" : "",
                         isTransitioning ? "transitioning" : "",
                     ].join(" navbar-item")
                     }

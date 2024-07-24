@@ -25,9 +25,12 @@ export default function RecetaCard({receta}) {
             <p className="title is-5">{receta.title}</p>
             <div className="is-flex is-align-items-center">
                 <p className="mr-4"><ion-icon name="people"></ion-icon>{receta.view_count}</p>
-                <p><ion-icon name="time"></ion-icon>{receta.preparation_time} min</p>
+                <p><ion-icon name="time"></ion-icon>{receta.preparation_time} mins</p>
             </div>
         </div>
+        <footer class="card-footer">
+            <p class="card-footer-item">Más detalles</p>
+        </footer>
     </div>
     );
 }
