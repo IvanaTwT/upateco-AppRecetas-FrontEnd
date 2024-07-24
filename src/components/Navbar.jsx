@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import Login from "./Auth/Login";
+import logo from "./recetas/logo.png"
 import { useAuth } from "./contexts/AuthContext";
 
 export default function Navbar() {
@@ -8,9 +8,12 @@ export default function Navbar() {
 
     return (
     <header>
-        <nav
-            className={"navbar is-fixed-top custom navbar-shadow is-primary"}
-        >
+        <nav className="navbar is-fixed-top has-shadow custom" role="navigation" aria-label="main navigation">
+            <div className="navbar-brand">
+                <div className="navbar-item" href="/">
+                    <img src={logo} alt="Recipe" />
+                </div>
+            </div>
             <div className="navbar-start">
 
                 <NavLink
@@ -33,28 +36,28 @@ export default function Navbar() {
             </div>
 
             <div className="navbar-end">
-
                 <div className="navbar-item has-dropdown is-hoverable">
-                    <a className="navbar-link">
+                    <div className="navbar-link">
                         <button className="button is-dark is-rounded" style={{ padding: "0px" }}>
                             <ion-icon name="person-circle-outline" style={{ width: "40px", height: "40px" }} ></ion-icon>
                         </button>
-                    </a>
+                    </div>
 
                     <div className="navbar-dropdown is-right">
-                        <a className="navbar-item">
-                            <NavLink class="navbar-link" to="/">
+                        <div className="navbar-item">
+                            <NavLink className="navbar-link " to="/">
                                 Mis recetas
                             </NavLink>
-                        </a>
+                        </div>
                         <div className="navbar-item">
-                            <NavLink className="navbar-link" to="/recetas/new">
+                            <NavLink className="navbar-link"  to="/recetas/new">
                                 Subir una receta
                             </NavLink>
                         </div>
+                        <hr className="navbar-divider" />
                         {!isAuthenticated ? (
                             <NavLink className="navbar-item" to="/login">
-                                <button className="button">
+                                <button className="button custom">
                                     Iniciar sesión
                                 </button>
                             </NavLink>

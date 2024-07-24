@@ -28,8 +28,8 @@ export default function RecetaCard({receta}) {
                 <p><ion-icon name="time"></ion-icon>{receta.preparation_time} mins</p>
             </div>
         </div>
-        <footer class="card-footer">
-            <p class="card-footer-item">Más detalles</p>
+        <footer className="card-footer">
+            <p className="card-footer-item">Más detalles</p>
         </footer>
     </div>
     );

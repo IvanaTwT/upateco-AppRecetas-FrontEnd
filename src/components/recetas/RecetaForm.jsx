@@ -15,9 +15,11 @@ export default function RecetaForm() {
   const [servings, setServings] = useState(null);
   const [image, setImage] = useState(null);
   const [formCargado, setFormCargado]= useState(false);
-  const [ingredients, setIngredients] = useState(""); //array
-  const [locations, setLocations] = useState("");  //array
-  const [categories, setCategories] = useState(""); //array
+  const [ingredients, setIngredients] = useState([]); //array
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
+  // const [locations, setLocations] = useState([]);  //array
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   const [{ data, isError, isLoading }, doFetch] = useFetch(
     "https://sandbox.academiadevelopers.com/reciperover/recipes/",
@@ -222,7 +224,33 @@ export default function RecetaForm() {
                 />
               </div>
             </div>
-
+            <div className="field">
+                <label className="label">Ingredientes</label>
+                <div className="select is-fullwidth is-multiple">
+                    <select
+                        multiple
+                        size="4"
+                        // value={selectedCategories.map((cat) => cat.id)}
+                        // onChange={handleCategoryChange}
+                    >
+                        {/* {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))} */}
+                        <option key="1" value="1">Ingrediente 1</option>
+                        <option key="2" value="2">Ingrediente 2</option>
+                        <option key="3" value="3">Ingrediente 3</option>
+                        <option key="4" value="4">Ingrediente 4</option>
+                        <option key="5" value="5">Ingrediente 5</option>
+                        <option key="6" value="6">Ingrediente 6</option>
+                        <option key="7" value="7">Ingrediente 7</option>
+                        <option key="8" value="8">Ingrediente 8</option>
+                        <option key="9" value="9">Ingrediente 9</option>
+                        <option key="10" value="10">Ingrediente 10</option>
+                    </select>
+                </div>
+            </div>
             <div className="field">
               <label htmlFor="servings">Raciones:</label>
               <div className="control">
@@ -235,6 +263,25 @@ export default function RecetaForm() {
                   onChange={handleChange}
                 />
               </div>
+              <div className="field">
+                <label className="label">Categorías</label>
+                <div className="select is-fullwidth is-multiple">
+                    <select
+                        multiple
+                        size="4"
+                        // value={selectedCategories.map((cat) => cat.id)}
+                        // onChange={handleCategoryChange}
+                    >
+                        {/* {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))} */}
+                        <option key="1" value="1">categoria 1</option>
+                        <option key="2" value="2">categoria 2</option>
+                    </select>
+                </div>
+            </div>
             </div>
             <div className="field">
               <div className="control">

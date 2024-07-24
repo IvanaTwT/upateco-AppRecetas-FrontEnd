@@ -40,11 +40,11 @@ export default function RecetaIngrediente({ receta }) {
         <div>
             {/* {ingredientes.length > 0 ? ( */}
 
-            <table class="table is-striped is-hoverable">
+            <table className="table is-striped is-hoverable">
                 <tbody>
                     <tr>
-                        <td class="has-text-left">sa</td>
-                        <td class="has-text-right">1 kg.</td>
+                        <td className="has-text-left">sa</td>
+                        <td className="has-text-right">1 kg.</td>
                     </tr>
                     <tr>
                         <td>asdsa</td>
