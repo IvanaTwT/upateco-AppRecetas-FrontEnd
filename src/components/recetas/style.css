@@ -1,0 +1,21 @@
+
+/* styles.css */
+.ingredient-item {
+  display: flex;
+  justify-content: space-between; /* Espacio entre el contenido del strong y el span */
+  align-items: center; /* Centra verticalmente los elementos dentro del ítem */
+  margin-bottom: 0.5rem; /* Espaciado entre los ítems */
+  padding: 0.5rem 0; /* Espaciado interno de cada ítem */
+  border-bottom: 1px solid #ddd; /* Línea divisoria */
+}
+
+.ingredient-details {
+  text-align: right; /* Alinea el texto dentro del span a la derecha */
+  margin-left: auto; /* Asegura que el span esté alineado al final del contenedor flex */
+}
+
+.columna-ingredients{
+  margin: 1em;
+  border: 1px solid #248b21; /* Borde alrededor de cada ítem */
+  border-radius: 4px; 
+}

@@ -11,16 +11,25 @@ import defaultImage from "./logo.png";
 
 export default function RecetaDetail() {
   const { id } = useParams();
+  // const [categories, setCategories] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
 
   const { isAuthenticated, token } = useAuth("state");
   const [{ data, isError, isLoading }, doFetch] = useFetch(
-    "https://sandbox.academiadevelopers.com/reciperover/recipes/",
+    `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/`,
     {}
   );
+  
+  // const recipeCategoriasUrl = `${
+  //   import.meta.env.VITE_API_BASE_URL
+  // }/reciperover/recipes/${id}/categories`;
 
   useEffect(() => {
     doFetch();
+   
   }, []);
+
+ 
 
   if (isLoading) return <p>Cargando...</p>;
   if (isError) return <p>Error al cargar las recetas.</p>;
@@ -36,7 +45,10 @@ export default function RecetaDetail() {
           <div className="column">
             <div className="media-left">
               <figure className="image is-square">
-                <img src={defaultImage} alt={receta.title} />
+                <img
+                  src={receta.image ? receta.image : defaultImage}
+                  alt={receta.title}
+                />
               </figure>
             </div>
           </div>
@@ -54,7 +66,6 @@ export default function RecetaDetail() {
                           <ion-icon name="create-outline"></ion-icon>
                         </button>
                       </NavLink>
-
                       <NavLink to={`../`} relative="path">
                         <button className="button is-danger">
                           <ion-icon name="trash-outline"></ion-icon>
@@ -115,13 +126,10 @@ export default function RecetaDetail() {
           </div>
         </div>
 
-        <div className="card">
+        <div className="card ">
           <div className="card-content">
-            <div className="content">
-              <h3 className="title is-5">Ingredientes</h3>
-              <RecetaIngrediente receta={receta} />
-              <hr />
-              <h3 className="title is-5">Preparación</h3>
+            <div className="columns is-multiline">
+              <RecetaIngrediente/>
               <RecetaPasos receta={receta} />
             </div>
           </div>

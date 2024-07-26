@@ -1,68 +1,85 @@
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
+import "./style.css"
+import { useParams, NavLink } from "react-router-dom";
+export default function RecetaIngrediente() {
+  // const { isAuthenticated, token } = useAuth("state");
+  const { id } = useParams();
+  const [ingredients, setIngredients] = useState([]);
 
-export default function RecetaIngrediente({ receta }) {
+  const [
+    {
+      data: dataIngredientes,
+      isError: isErrorIngredientes,
+      isLoading: isLoadingIngredientes,
+    },
+    doFetchIngredientes,
+  ] = useFetch(
+    `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/`,
+    {}
+  );
+  const reciperIngredienteUrl = `${
+    import.meta.env.VITE_API_BASE_URL
+  }/reciperover/recipes/${id}/ingredients`;
 
-    // const { isAuthenticated, token } = useAuth("state");
-    // const [{ data: ingredientesData, isError: ingredientesError, isLoading: ingredientesLoading }, fetchIngredientes] = useFetch(
-    //     "https://sandbox.academiadevelopers.com/reciperover/ingredients/",
-    //     {}
-    // );
-    // const [{ data: recipeIngredientsData, isError: recipeIngredientsError, isLoading: recipeIngredientsLoading }, fetchRecipeIngredients] = useFetch(
-    //     "https://sandbox.academiadevelopers.com/reciperover/recipes/ingredients/",
-    //     {}
-    // );
-    // const [ingredientes, setIngredientes] = useState([]);
+  useEffect(() => {
+    doFetchIngredientes();
+  }, []);
 
-    // useEffect(() => {
-    //     fetchIngredientes();
-    //     fetchRecipeIngredients();
-    // }, [fetchIngredientes, fetchRecipeIngredients]);
+  useEffect(() => {
+    if (dataIngredientes) {
+      fetch(reciperIngredienteUrl)
+        .then((response) => response.json())
+        .then((recipeIngredient) => {
+          //quantity, measure, ingredient (integer) recipe (integer)
+          const listIng = [];
+          dataIngredientes.forEach((ingrediente) => {
+            const [ing] = recipeIngredient.filter(
+              (rp) => ingrediente.id === rp.ingredient
+            ); //devuelve lista
+            if (ing) {
+              listIng.push({
+                id: ingrediente.id,
+                name: ingrediente.name,
+                quantity: ing.quantity,
+                measure: ing.measure,
+              });
+            }
+          });
+          setIngredients(listIng);
+        })
+        .catch((error) => console.error("Error fetching ingredients:", error));
+    }
+    //   fetch(recipeCategoriasUrl)
+    //     .then((response) => response.json())
+    //     .then((data) => setCategories(data))
+    //     .catch((error) => console.error('Error fetching categories:', error));
+  }, [dataIngredientes, id]);
 
-    // useEffect(() => {
-    //     if (ingredientesData && recipeIngredientsData && receta.id) {
-    //         const ingredientesReceta = recipeIngredientsData
-    //             .filter((ri) => ri.recipe === receta.id)
-    //             .map((ri) => {
-    //                 const ingrediente = ingredientesData.find((i) => i.id === ri.ingredient);
-    //                 return ingrediente ? { ...ingrediente, quantity: ri.quantity, measure: ri.measure } : null;
-    //             })
-    //             .filter((i) => i !== null);
-    //         setIngredientes(ingredientesReceta);
-    //     }
-    // }, [ingredientesData, recipeIngredientsData, receta.id]);
 
-    // if (ingredientesLoading || recipeIngredientsLoading) return <p>Cargando...</p>;
-    // if (ingredientesError || recipeIngredientsError) return <p>Error al cargar los ingredientes.</p>;
+  return (
+    <div className="column is-narrow-mobile is-narrow-tablet is-3 columna-ingredients" >
+        <h3 className="title is-5 has-text-centered">Ingredientes</h3>
+        
+        {ingredients.length > 0 ? (
 
-    return (
-        <div>
-            {/* {ingredientes.length > 0 ? ( */}
-
-            <table className="table is-striped is-hoverable">
-                <tbody>
-                    <tr>
-                        <td className="has-text-left">sa</td>
-                        <td className="has-text-right">1 kg.</td>
-                    </tr>
-                    <tr>
-                        <td>asdsa</td>
-                        <td>100 gr.</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            {/* <ul>
-                {ingredientes.map((ingrediente) => (
-                    <li key={ingrediente.id}>
-                        {ingrediente.name} {ingrediente.quantity}{ingrediente.measure}
-                    </li>
-                ))}
-            </ul>
-            ) : (
-                <p>No hay ingredientes especificados para esta receta.</p>
-            )} */}
-        </div>
-    );
+        <ul className="">
+           {ingredients.map((ingrediente) => (
+              <li key={ingrediente.id} className="ingredient-item">
+                <strong className="">{ingrediente.name}:</strong>
+                <span className="ingredient-details">
+                  {ingrediente.quantity}
+                  {ingrediente.measure}
+                </span>
+                <hr />
+              </li>
+            ))}
+          </ul> 
+  
+        ) : (
+          <p>No hay ingredientes disponibles</p>
+        )}
+    </div>
+  );
 }

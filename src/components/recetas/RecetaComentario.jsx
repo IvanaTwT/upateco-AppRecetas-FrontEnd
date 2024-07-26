@@ -6,7 +6,9 @@ import { formatDate, formatDateTime } from "../hooks/utils";
 export default function RecetaComentario({ receta }) {
 
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `https://sandbox.academiadevelopers.com/reciperover/comments/`,
+        `${
+            import.meta.env.VITE_API_BASE_URL
+          }/reciperover/comments/`,
         {}
     );
 

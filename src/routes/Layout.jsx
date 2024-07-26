@@ -6,11 +6,11 @@ import { AuthProvider } from "../components/contexts/AuthContext";
 export default function Layout() {
     return (
         <AuthProvider>
+            <Navbar />
             <div className="container">
-                <Navbar />
-                <Outlet />
-                <Footer />
+                <Outlet />  
             </div>
+            <Footer />
         </AuthProvider>
     );
 }
