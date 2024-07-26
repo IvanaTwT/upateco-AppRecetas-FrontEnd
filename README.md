@@ -88,7 +88,34 @@ Permite crear, leer, actualizar y eliminar recetas a través de formularios.
 
 Base URL: `https://sandbox.academiadevelopers.com`
 
-### Recipe Categories <a name = "recipe-categories"></a>
+### Auth <a name = "auth"></a>
+
+| Endpoint                         | Método | Descripción                                         |
+|----------------------------------|--------|-----------------------------------------------------|
+| /api-auth/                       | POST   | Autenticación                                       |
+
+### Users <a name = "users"></a>
+
+| Endpoint                       | Método | Descripción                       |
+|--------------------------------|--------|-----------------------------------|
+| /users/profiles/               | GET    | Listar perfiles                   |
+| /users/profiles/login/         | POST   | Login                             |
+| /users/profiles/logout/        | POST   | Logout                            |
+| /users/profiles/profile_data/  | GET    | Obtener datos del perfil          |
+| /users/profiles/{id}/          | GET    | Obtener perfil                    |
+| /users/profiles/{id}/          | PUT    | Actualizar perfil                 |
+| /users/profiles/{id}/          | PATCH  | Actualizar parcialmente perfil    |
+
+| Endpoint                   | Método | Descripción                      |
+|----------------------------|--------|----------------------------------|
+| /users/user-states/        | GET    | Listar estados de usuario        |
+| /users/user-states/        | POST   | Crear estado de usuarios         |
+| /users/user-states/{id}    | GET    | Obtener un estado de usuario     |
+| /users/user-states/{id}    | PUT    | Actualizar estado de usuario     |
+| /users/user-states/{id}    | PATCH  | Actualizar estado de usuario     |
+| /users/user-states/{id}    | DELETE | Eliminar estado de usuario       |
+
+### Auth <a name = "recipe-categories"></a>
 
 | Endpoint                         | Método | Descripción                                         |
 |----------------------------------|--------|-----------------------------------------------------|
