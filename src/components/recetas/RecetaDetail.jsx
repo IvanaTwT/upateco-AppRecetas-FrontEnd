@@ -5,8 +5,11 @@ import { formatDate } from "../hooks/utils";
 import { useAuth } from "../contexts/AuthContext";
 import RecetaIngrediente from "./RecetaIngrediente";
 import RecetaComentario from "./RecetaComentario";
+import RecetaCategoria from "./RecetaCategoria";
+import RecetaLocacion from "./RecetaLocacion";
 import ComentarioForm from "./ComentarioForm";
 import RecetaPasos from "./RecetaPasos";
+import User from "./User";
 import defaultImage from "./logo.png";
 
 export default function RecetaDetail() {
@@ -91,23 +94,29 @@ export default function RecetaDetail() {
                   </p>
                 </div>
                 <hr className="hr" />
-                <div className="content">{receta.description}</div>
+                <div className="content">
+                  {receta.description}
+                </div>
 
                 <p>
-                  <strong>Locaciones:</strong> {receta.locations.join(", ")}
+                  <strong>Locaciones:</strong> <RecetaLocacion/>
                 </p>
                 <p>
-                  <strong>Categorías:</strong> {receta.categories.join(", ")}
+                  <strong>Categorías:</strong> <RecetaCategoria/>
                 </p>
                 <p>
-                  <strong>Raciones:</strong> {receta.servings}
+                  <strong>{receta.servings} Porciones</strong> 
                 </p>
+
               </div>
 
               <footer className="card-footer mt-auto">
-                <div className="card-footer-item">
+                <div className="card-footer-item has-text-centered is-flex is-justify-content-center">
                   <p>
-                    <strong>Autor:</strong> {receta.owner}
+                    <strong>Autor:</strong>
+                    <NavLink to={`../../profile/${receta.owner}`} relative="path">
+                      <User id={receta.owner}/>
+                    </NavLink>
                   </p>
                 </div>
                 <div className="card-footer-item">
@@ -122,6 +131,7 @@ export default function RecetaDetail() {
                   </p>
                 </div>
               </footer>
+
             </div>
           </div>
         </div>

@@ -2,6 +2,8 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDate, formatDateTime } from "../hooks/utils";
+import User from "./User";
+import { useParams, NavLink } from "react-router-dom";
 
 export default function RecetaComentario({ receta }) {
 
@@ -41,7 +43,11 @@ export default function RecetaComentario({ receta }) {
                                 <ion-icon name="person" size="large"></ion-icon>
                             </div>
                             <div className="media-content">
-                                <p className="title is-6">Autor: {comentario.author}</p>
+                                <p className="title is-6">
+                                    <NavLink to={`../../profile/${receta.owner}`} relative="path">
+                                        <User id={receta.owner}/>
+                                    </NavLink>
+                                </p>
                                 <p>{comentario.content}</p>
                                 <p><small className="has-text-grey-light">{formatDateTime(comentario.created_at)}</small></p>
                             </div>

@@ -20,13 +20,13 @@
     --bulma-primary-h: 93deg;
     --bulma-primary-s: 79%;
     --bulma-primary-l: 61%;
-  }
+}
   
-  .custom {
+.custom {
     background-color: hsl(var(--bulma-primary-h), var(--bulma-primary-s), var(--bulma-primary-l));
     color: white;
     width: "100%"
-  }
+}
 
 .card-content p {
     display: flex;

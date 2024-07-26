@@ -18,12 +18,6 @@ export default function Home() {
             <RecetasList />
           </div>
         </div>
-        <div className="column is-full">
-          <div className="box">
-            <h1 className="title">Categorias:</h1>
-            <RecetasList />
-          </div>
-        </div>
       </div>
     </div>
   );

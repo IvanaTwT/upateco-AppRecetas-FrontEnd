@@ -13,13 +13,13 @@ export default function RecetaCard({receta}) {
     return (
     <div className="card" onClick={() => navigate(`/recetas/${receta.id}`)}>
         <div className="card-image">
-            <figure className="image is-half">
-                <img
-                    src={imageSrc}
-                    alt={receta.title}
-                    onError={handleError}
-                />
-            </figure>
+                <figure className="image is-1by1">
+                    <img
+                        src={imageSrc}
+                        alt={receta.title}
+                        onError={handleError}
+                    />
+                </figure>
         </div>
         <div className="card-content">
             <p className="title is-5">{receta.title}</p>

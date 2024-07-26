@@ -10,9 +10,9 @@ export default function Navbar() {
     <header>
         <nav className="navbar is-fixed-top has-shadow custom" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
-                <div className="navbar-item" href="/">
+                <a className="navbar-item" href="/">
                     <img src={logo} alt="Recipe" />
-                </div>
+                </a>
             </div>
             <div className="navbar-start">
 
@@ -36,14 +36,33 @@ export default function Navbar() {
             </div>
 
             <div className="navbar-end">
+
+                {isAuthenticated ? (
+                    <div className="navbar-item has-text-white">
+                        BIENVENIDA/O!
+                    </div>
+                ) : (
+                    <div className="navbar-item">
+                        <NavLink to="/login" className="has-text-white">
+                            CONÉCTATE
+                        </NavLink>
+                    </div>
+                )}
+
                 <div className="navbar-item has-dropdown is-hoverable">
                     <div className="navbar-link">
-                        <button className="button is-dark is-rounded" style={{ padding: "0px" }}>
-                            <ion-icon name="person-circle-outline" style={{ width: "40px", height: "40px" }} ></ion-icon>
-                        </button>
+                        <button className="button is-primary is-rounded" style={{ padding: "0px" }}>
+                            <ion-icon name="person-circle-outline" style={{ width: "40px", height: "40px", color: "white"}} ></ion-icon>
+                         </button>
                     </div>
 
                     <div className="navbar-dropdown is-right">
+                        {/* <div className="navbar-item">
+                            <NavLink className="navbar-link " to={`../profile/${user.id}`} relative="path">
+                                Mi Perfil
+                            </NavLink>
+                        </div> */}
+
                         <div className="navbar-item">
                             <NavLink className="navbar-link " to="/">
                                 Mis recetas

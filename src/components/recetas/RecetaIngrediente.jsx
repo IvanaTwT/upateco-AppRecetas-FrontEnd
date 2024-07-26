@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 // import { useAuth } from "../contexts/AuthContext";
 import "./style.css"
 import { useParams, NavLink } from "react-router-dom";
+
 export default function RecetaIngrediente() {
+  
   // const { isAuthenticated, token } = useAuth("state");
   const { id } = useParams();
   const [ingredients, setIngredients] = useState([]);
@@ -78,7 +80,7 @@ export default function RecetaIngrediente() {
           </ul> 
   
         ) : (
-          <p>No hay ingredientes disponibles</p>
+          <p>No hay ingredientes disponibles para esta receta</p>
         )}
     </div>
   );

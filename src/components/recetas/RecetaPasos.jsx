@@ -36,7 +36,7 @@ export default function RecetaPasos({ receta }) {
             ))}
           </ol>
         ) : (
-          <p>No hay pasos disponibles para esta receta.</p>
+          <p>No hay pasos disponibles para esta receta</p>
         )}
       </div>
     </div>
