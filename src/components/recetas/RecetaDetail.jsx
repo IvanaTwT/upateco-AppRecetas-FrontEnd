@@ -105,7 +105,7 @@ export default function RecetaDetail() {
                   <strong>Categorías:</strong> <RecetaCategoria/>
                 </p>
                 <p>
-                  <strong>{receta.servings} Porciones</strong> 
+                  <strong> Porciones: {" "}</strong> 
                 </p>
 
               </div>
@@ -113,7 +113,7 @@ export default function RecetaDetail() {
               <footer className="card-footer mt-auto">
                 <div className="card-footer-item has-text-centered is-flex is-justify-content-center">
                   <p>
-                    <strong>Autor:</strong>
+                    <strong>Autor: {" "}</strong>
                     <NavLink to={`../../profile/${receta.owner}`} relative="path">
                       <User id={receta.owner}/>
                     </NavLink>

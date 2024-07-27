@@ -25,7 +25,6 @@ export default function User({ id }) {
             }  
         }
     );
-
     useEffect(() => {
         if (isAuthenticated) {
             console.log("Fetching user data...");
@@ -46,7 +45,7 @@ export default function User({ id }) {
     return (
         <div>
             {user ? (
-                <p>{user.first_name} {user.last_name}</p>
+                <p>{user.first_name} {" "} {user.last_name}</p>
             ) : (
                 <p>Usuario eliminado</p>
             )}

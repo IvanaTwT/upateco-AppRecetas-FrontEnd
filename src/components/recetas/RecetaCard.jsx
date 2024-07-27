@@ -11,7 +11,7 @@ export default function RecetaCard({receta}) {
     };
 
     return (
-    <div className="card" onClick={() => navigate(`/recetas/${receta.id}`)}>
+    <div className="card" >
         <div className="card-image">
                 <figure className="image is-1by1">
                     <img
@@ -28,7 +28,7 @@ export default function RecetaCard({receta}) {
                 <p><ion-icon name="time"></ion-icon>{receta.preparation_time} mins</p>
             </div>
         </div>
-        <footer className="card-footer">
+        <footer className="card-footer" style={{backgroundColor : "#005eff" , color: "#fff" , cursor: "pointer"}} onClick={() => navigate(`/recetas/${receta.id}`)}> {/*005eff 1F75FE*/}
             <p className="card-footer-item">Más detalles</p>
         </footer>
     </div>

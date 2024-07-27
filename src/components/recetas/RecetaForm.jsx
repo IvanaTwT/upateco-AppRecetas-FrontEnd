@@ -2,138 +2,133 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import Ingrediente from "../Ingredientes/Ingrediente";
+import IngredientesList from "../Ingredientes/IngredienteList";
 
 export default function RecetaForm() {
   const { id } = useParams();
-
   const { isAuthenticated, token } = useAuth("state");
-  // console.log("Autenticado: "+isAuthenticated)
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [preparation_time, setPreparationTime] = useState(null);
-  const [cooking_time, setCookingTime] = useState(null);
-  const [servings, setServings] = useState(null);
+
+  const [recipe, setRecipe] = useState({
+    title: "",
+    description: "",
+    preparation_time: null,
+    cooking_time: null,
+    servings: null,
+  });
+
   const [image, setImage] = useState(null);
-  const [formCargado, setFormCargado]= useState(false);
-  const [ingredients, setIngredients] = useState([]); //array
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
-  // const [locations, setLocations] = useState([]);  //array
+  const [formCargado, setFormCargado] = useState(false);
+  const [ingredientes, setIngredientes] = useState([]);
+  const [ingredientesOfRecipe, setIngredientesOfRecipe] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   const [{ data, isError, isLoading }, doFetch] = useFetch(
-    "https://sandbox.academiadevelopers.com/reciperover/recipes/",
+    `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
+    {}
+  );
+
+  const [
+    {
+      data: dataCategorias,
+      isError: isErrorCategorias,
+      isLoading: isLoadingCategorias,
+    },
+    doFetchCategorias,
+  ] = useFetch(
+    `${import.meta.env.VITE_API_BASE_URL}/reciperover/categories/`,
     {}
   );
 
   useEffect(() => {
     doFetch();
   }, []);
-  //crear receta
-  const [{ data: dataPost, isError:isErrorPost, isLoading: isLoadingPost }, doFetchPost] = useFetch(
-    "https://sandbox.academiadevelopers.com/reciperover/recipes/",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
-      },
-  }
-  );
-  //   modificar receta
-  const [{ dataPut, isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
-    `https://sandbox.academiadevelopers.com/reciperover/recipes/${id}`,
-    {
-      method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Token ${token}`,
-    },
-  }
-  );
-  // use effect para los datos del formulario
-  useEffect(() => {
-    if (formCargado) {
-      const nuevoObjeto = {
-        "title":title,
-        "description":description,
-        "preparation_time":preparation_time,
-        "cooking_time":cooking_time,
-        "servings":servings,
-        "image":image,
-      };
-      console.log(nuevoObjeto)
-      // Petición PUT
-      if(window.location.pathname != "/recetas/new"){
-        console.log("haciendo put...")
-        doFetchPut({
-          body: JSON.stringify(nuevoObjeto),
-        })
-      }else{
-        console.log("haciendo post...")
-        doFetchPost({
-          body: JSON.stringify(nuevoObjeto),
-        })
-        console.log("Data:"+dataPost)
-      }
-      
-    
-      // console.log('Error:', isErrorPut)
-      setFormCargado(false);
-    }
-  }, [formCargado, title, description, preparation_time, cooking_time, servings, image]);
 
-
-// efecto para cuando haya algo en data
   useEffect(() => {
-    if (data && window.location.pathname != "/recetas/new") {
-      // console.log(window.location.pathname);
-      setTitle(receta.title);
-      setDescription(receta.description);
-      setPreparationTime(receta.preparation_time);
-      setCookingTime(receta.cooking_time);
-      setServings(receta.servings);
-      setImage(receta.image);
-      // console.log(data)//[{…}, {…}]
+    doFetchCategorias();
+
+    if (data && window.location.pathname !== "/recetas/new") {
+      setRecipe({
+        title: data.title || "",
+        description: data.description || "",
+        preparation_time: data.preparation_time || "",
+        cooking_time: data.cooking_time || "",
+        servings: data.servings || "",
+      });
+      setImage(data.image);
+      setIngredientesOfRecipe(data.ingredients);
+      setCategories(data.categories);
     }
   }, [data]);
 
+  const [
+    { data: dataPost, isError: isErrorPost, isLoading: isLoadingPost },
+    doFetchPost,
+  ] = useFetch(`${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/`, {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+
+  const [{ dataPut, isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
+    `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    }
+  );
+
+  function addIngrediente(ingrediente) {
+    setIngredientes([...ingredientes, ingrediente]);
+  }
+
+  useEffect(() => {
+    if (formCargado) {
+      const newForm = new FormData();
+      newForm.append("title", recipe.title);
+      newForm.append("description", recipe.description);
+      newForm.append("preparation_time", recipe.preparation_time);
+      newForm.append("cooking_time", recipe.cooking_time);
+      newForm.append("servings", recipe.servings);
+
+      if (image) {
+        newForm.append("image", image);
+      }
+
+      if (window.location.pathname !== "/recetas/new") {
+        console.log("peticion put");
+        // doFetchPut({ body: newForm });
+      } else {
+        console.log("peticion post");
+        // doFetchPost({ body: newForm });
+      }
+
+      setFormCargado(false);
+    }
+  }, [formCargado, recipe, image, ingredientes]);
 
   if (isLoading) return <p>Cargando...</p>;
   if (isError) return <p>Error al cargar las recetas.</p>;
   if (!data) return <p>No hay recetas disponibles</p>;
 
-  const [receta] = data.filter((receta) => receta.id === parseInt(id));
-
   function handleSubmit(event) {
     event.preventDefault();
-    setFormCargado(true)
-
+    setFormCargado(true);
   }
 
-  function handleChange(e) {
-    switch (e.target.name) {
-      case "title":
-        setTitle(e.target.value);
-        break;
-      case "description":
-        setDescription(e.target.value);
-        break;
-      case "preparation_time":
-        setPreparationTime(e.target.value);
-        break;
-      case "cooking_time":
-        setCookingTime(e.target.value);
-        break;
-      case "servings":
-        setServings(e.target.value);
-        break;
-      case "image":
-        setImage(e.target.value);
-        break;
-      default:
-        break;
-    }
+  function handleImageChange(event) {
+    setImage(event.target.files[0]);
+  }
+
+  function handleRecipeChange(event) {
+    setRecipe({
+      ...recipe,
+      [event.target.name]: event.target.value,
+    });
   }
 
   return (
@@ -141,47 +136,39 @@ export default function RecetaForm() {
       <div className="columns is-centered">
         <div className="column is-4">
           <form onSubmit={handleSubmit}>
-          <div className="card-image">
-              <img
-                src={
-                  image
-                }
-                alt={title}
-              />
+            <div>
+              <figure className="image">
+                <img src={image} alt={recipe.title} />
+              </figure>
             </div>
-
             <div className="field">
-              <label htmlFor="image">Imagen URL:</label>
+              <label className="label">Imagen:</label>
               <div className="control">
                 <input
                   className="input"
-                  type="text"
-                  rows={3}
-                  id="image"
-                  name="image"
-                  defaultValue={image}
-                  // value={image}
-                  onChange={handleChange}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label htmlFor="title">Nombre receta: (*)</label>
+              <label htmlFor="title" className="label">Nombre receta: (*)</label>
               <div className="control">
                 <input
                   className="input"
                   type="text"
                   id="title"
                   name="title"
-                  defaultValue={title}
-                  onChange={handleChange}
+                  defaultValue={recipe.title}
+                  onChange={handleRecipeChange}
                   required
                 />
               </div>
             </div>
 
             <div className="field">
-              <label htmlFor="preparation_time">
+              <label htmlFor="preparation_time" className="label">
                 Tiempo Preparación (min): (*)
               </label>
               <div className="control">
@@ -191,14 +178,14 @@ export default function RecetaForm() {
                   rows={3}
                   id="preparation_time"
                   name="preparation_time"
-                  defaultValue={preparation_time}
-                  onChange={handleChange}
+                  defaultValue={recipe.preparation_time}
+                  onChange={handleRecipeChange}
                 />
               </div>
             </div>
 
             <div className="field">
-              <label htmlFor="cooking_time">Tiempo Cocción (min): (*)</label>
+              <label htmlFor="cooking_time" className="label">Tiempo Cocción (min): (*)</label>
               <div className="control">
                 <input
                   className="input"
@@ -206,82 +193,65 @@ export default function RecetaForm() {
                   rows={3}
                   id="cooking_time"
                   name="cooking_time"
-                  defaultValue={cooking_time}
-                  onChange={handleChange}
+                  defaultValue={recipe.cooking_time}
+                  onChange={handleRecipeChange}
                 />
               </div>
             </div>
 
             <div className="field">
-              <label htmlFor="description">Descripción:</label>
+              <label htmlFor="description" className="label">Descripción:</label>
               <div className="control">
                 <textarea
                   className="textarea"
                   id="description"
                   name="description"
-                  defaultValue={description}
-                  onChange={handleChange}
+                  defaultValue={recipe.description}
+                  onChange={handleRecipeChange}
                 />
               </div>
             </div>
-            <div className="field">
-                <label className="label">Ingredientes</label>
-                <div className="select is-fullwidth is-multiple">
-                    <select
-                        multiple
-                        size="4"
-                        // value={selectedCategories.map((cat) => cat.id)}
-                        // onChange={handleCategoryChange}
-                    >
-                        {/* {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))} */}
-                        <option key="1" value="1">Ingrediente 1</option>
-                        <option key="2" value="2">Ingrediente 2</option>
-                        <option key="3" value="3">Ingrediente 3</option>
-                        <option key="4" value="4">Ingrediente 4</option>
-                        <option key="5" value="5">Ingrediente 5</option>
-                        <option key="6" value="6">Ingrediente 6</option>
-                        <option key="7" value="7">Ingrediente 7</option>
-                        <option key="8" value="8">Ingrediente 8</option>
-                        <option key="9" value="9">Ingrediente 9</option>
-                        <option key="10" value="10">Ingrediente 10</option>
-                    </select>
-                </div>
+            <div className="ingredientes">
+                
+                {/* <IngredientesList></IngredientesList> */}
+                <Ingrediente addIngrediente={addIngrediente}></Ingrediente>
             </div>
+            
             <div className="field">
-              <label htmlFor="servings">Raciones:</label>
+              <label htmlFor="servings" className="label">Raciones:</label>
               <div className="control">
                 <input
                   className="input"
                   type="number"
                   id="servings"
                   name="servings"
-                  defaultValue={servings}
-                  onChange={handleChange}
+                  defaultValue={recipe.servings}
+                  onChange={handleRecipeChange}
                 />
               </div>
               <div className="field">
                 <label className="label">Categorías</label>
                 <div className="select is-fullwidth is-multiple">
-                    <select
-                        multiple
-                        size="4"
-                        // value={selectedCategories.map((cat) => cat.id)}
-                        // onChange={handleCategoryChange}
-                    >
-                        {/* {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))} */}
-                        <option key="1" value="1">categoria 1</option>
-                        <option key="2" value="2">categoria 2</option>
-                    </select>
+                  <select
+                    multiple
+                    size="4"
+                    // value={selectedCategories.map((cat) => cat.id)}
+                    // onChange={handleCategoryChange}
+                  >
+                    {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                            {category.name}
+                        </option>
+                    ))}
+                    {/* <option key="1" value="1">
+                      categoria 1
+                    </option>
+                    <option key="2" value="2">
+                      categoria 2
+                    </option> */}
+                  </select>
                 </div>
-            </div>
+              </div>
             </div>
             <div className="field">
               <div className="control">
