@@ -9,11 +9,11 @@ export default function ComentarioForm({ recetaId }) {
     const [{ isError, isLoading }, doFetch] = useFetch(
         "https://sandbox.academiadevelopers.com/reciperover/comments/",
         {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${token}`,
-        },
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${token}`,
+            },
         }
     );
 
@@ -23,13 +23,13 @@ export default function ComentarioForm({ recetaId }) {
         if (content.trim() === "") return;
 
         doFetch({
-        body: JSON.stringify({
-            content: content,
-            recipe: recetaId,
-            parent: null,
-        }),
+            body: JSON.stringify({
+                content: content,
+                recipe: recetaId,
+                parent: null,
+            }),
         });
-        console.log("Contenido comments: "+content)
+        console.log("Contenido comments: " + content);
         setContent("");
     }
 
@@ -39,7 +39,10 @@ export default function ComentarioForm({ recetaId }) {
 
     return (
         <div className="comments">
-            <form onSubmit={handleSubmit} className="is-flex is-align-items-center">
+            <form
+                onSubmit={handleSubmit}
+                className="is-flex is-align-items-center"
+            >
                 <ion-icon name="person" size="large"></ion-icon>
                 <div className="field is-flex-grow-1 mx-2">
                     <div className="control">
@@ -56,10 +59,7 @@ export default function ComentarioForm({ recetaId }) {
                 </div>
                 <div className="field">
                     <div className="control">
-                        <button
-                            type="submit"
-                            className="button is-primary"
-                        >
+                        <button type="submit" className="button is-primary">
                             Calificar
                         </button>
                     </div>

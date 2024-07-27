@@ -8,7 +8,7 @@ function Login() {
     const [triggerFetch, setTriggerFetch] = useState(false);
 
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        "https://sandbox.academiadevelopers.com/api-auth/",
+        `${import.meta.env.VITE_API_BASE_URL}/api-auth/`,
         {
             method: "POST",
             headers: {
@@ -87,7 +87,9 @@ function Login() {
                                 {isLoading && triggerFetch && (
                                     <p>Cargando...</p>
                                 )}
-                                {isError && <p>Usuario o contraseña incorrectos</p>}
+                                {isError && (
+                                    <p>Usuario o contraseña incorrectos</p>
+                                )}
                                 {data && (
                                     <p>{`Token obtenido: ${data.token}`}</p>
                                 )}

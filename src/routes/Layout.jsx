@@ -8,7 +8,7 @@ export default function Layout() {
         <AuthProvider>
             <Navbar />
             <div className="container">
-                <Outlet />  
+                <Outlet />
             </div>
             <Footer />
         </AuthProvider>

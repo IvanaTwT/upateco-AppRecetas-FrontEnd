@@ -1,7 +1,7 @@
 import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 // import { useAuth } from "../contexts/AuthContext";
-import "./style.css"
+import "./style.css";
 import { useParams, NavLink } from "react-router-dom";
 
 export default function RecetaLocacion() {
@@ -21,7 +21,9 @@ export default function RecetaLocacion() {
         {}
     );
 
-    const recipeLocacionesUrl = `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}/locations`;
+    const recipeLocacionesUrl = `${
+        import.meta.env.VITE_API_BASE_URL
+    }/reciperover/recipes/${id}/locations`;
 
     useEffect(() => {
         doFetchLocaciones();
@@ -48,7 +50,9 @@ export default function RecetaLocacion() {
                     console.log("Filtered Locaciones: ", listLoc);
                     setLocaciones(listLoc);
                 })
-                .catch((error) => console.error("Error fetching locaciones:", error));
+                .catch((error) =>
+                    console.error("Error fetching locaciones:", error)
+                );
         }
         console.log("Data Locaciones: ", dataLocaciones);
     }, [dataLocaciones, id]);
@@ -58,9 +62,9 @@ export default function RecetaLocacion() {
             <div className="tags">
                 {locaciones.length > 0 ? (
                     locaciones.map((locacion) => (
-                        <NavLink 
-                            to={`/location/${locacion.id}`} 
-                            key={locacion.id} 
+                        <NavLink
+                            to={`/location/${locacion.id}`}
+                            key={locacion.id}
                             className="tag is-link"
                         >
                             #{locacion.name}

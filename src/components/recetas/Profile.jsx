@@ -4,10 +4,9 @@ import { formatDate } from "../hooks/utils";
 import { useAuth } from "../contexts/AuthContext";
 import defaultImage from "./logo.png";
 import { useParams, NavLink } from "react-router-dom";
-import "./style.css"
+import "./style.css";
 
 export default function Profile() {
-
     const { id } = useParams();
 
     const { isAuthenticated, token } = useAuth("state");
@@ -35,30 +34,49 @@ export default function Profile() {
 
     return (
         <section className="section">
-        <div className="container">
-            <div className="card">
-                <div className="card-content">
-                    <div className="media">
-                        <div className="media-left">
-                            <figure className="image is-128x128 profile-image">
-                                <img
-                                    src={user.image ? user.image : defaultImage}
-                                    alt={`${user.first_name} ${user.last_name}`}
-                                />
-                            </figure>
-                        </div>
-                        <div className="media-content">
-                            <h1 className="title is-3">{user.first_name} {user.last_name}</h1>
-                            <p className="subtitle is-5">@{user.username}</p>
-                            <p><strong>Email:</strong> {user.email}</p>
-                            <p><strong>Bio:</strong> {user.bio || "No disponible"}</p>
-                            <p><strong>Fecha de creación:</strong> {formatDate(user.created_at)}</p>
-                            <p><strong>Última actualización:</strong> {formatDate(user.updated_at)}</p>
+            <div className="container">
+                <div className="card">
+                    <div className="card-content">
+                        <div className="media">
+                            <div className="media-left">
+                                <figure className="image is-128x128 profile-image">
+                                    <img
+                                        src={
+                                            user.image
+                                                ? user.image
+                                                : defaultImage
+                                        }
+                                        alt={`${user.first_name} ${user.last_name}`}
+                                    />
+                                </figure>
+                            </div>
+                            <div className="media-content">
+                                <h1 className="title is-3">
+                                    {user.first_name} {user.last_name}
+                                </h1>
+                                <p className="subtitle is-5">
+                                    @{user.username}
+                                </p>
+                                <p>
+                                    <strong>Email:</strong> {user.email}
+                                </p>
+                                <p>
+                                    <strong>Bio:</strong>{" "}
+                                    {user.bio || "No disponible"}
+                                </p>
+                                <p>
+                                    <strong>Fecha de creación:</strong>{" "}
+                                    {formatDate(user.created_at)}
+                                </p>
+                                <p>
+                                    <strong>Última actualización:</strong>{" "}
+                                    {formatDate(user.updated_at)}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     );
 }

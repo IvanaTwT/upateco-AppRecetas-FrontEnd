@@ -6,11 +6,8 @@ import User from "./User";
 import { useParams, NavLink } from "react-router-dom";
 
 export default function RecetaComentario({ receta }) {
-
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${
-            import.meta.env.VITE_API_BASE_URL
-          }/reciperover/comments/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/comments/`,
         {}
     );
 
@@ -22,8 +19,8 @@ export default function RecetaComentario({ receta }) {
 
     useEffect(() => {
         if (data && receta.id) {
-            const comentariosReceta = data.filter((comentario) =>
-                comentario.recipe === receta.id
+            const comentariosReceta = data.filter(
+                (comentario) => comentario.recipe === receta.id
             );
             setComentarios(comentariosReceta);
         }
@@ -34,7 +31,9 @@ export default function RecetaComentario({ receta }) {
 
     return (
         <div className="comments">
-            <h3 className="title is-6">Calificaciones ({comentarios.length})</h3>
+            <h3 className="title is-6">
+                Calificaciones ({comentarios.length})
+            </h3>
             {comentarios.length > 0 ? (
                 comentarios.map((comentario) => (
                     <div key={comentario.id} className="box">
@@ -44,18 +43,27 @@ export default function RecetaComentario({ receta }) {
                             </div>
                             <div className="media-content">
                                 <p className="title is-6">
-                                    <NavLink to={`../../profile/${receta.owner}`} relative="path">
-                                        <User id={receta.owner}/>
+                                    <NavLink
+                                        to={`../../profile/${receta.owner}`}
+                                        relative="path"
+                                    >
+                                        <User id={receta.owner} />
                                     </NavLink>
                                 </p>
                                 <p>{comentario.content}</p>
-                                <p><small className="has-text-grey-light">{formatDateTime(comentario.created_at)}</small></p>
+                                <p>
+                                    <small className="has-text-grey-light">
+                                        {formatDateTime(comentario.created_at)}
+                                    </small>
+                                </p>
                             </div>
                         </div>
                     </div>
                 ))
             ) : (
-                <p className="has-text-grey">Sé el primero en dar una calificación</p>
+                <p className="has-text-grey">
+                    Sé el primero en dar una calificación
+                </p>
             )}
         </div>
     );

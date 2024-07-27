@@ -5,26 +5,18 @@ import { useAuth } from "../contexts/AuthContext";
 import "./style.css";
 
 export default function User({ id }) {
-
     const { isAuthenticated, token } = useAuth("state");
     const [user, setUser] = useState(null);
 
     const [
-        {
-            data: dataUser,
-            isError: isErrorUser,
-            isLoading: isLoadingUser,
-        },
+        { data: dataUser, isError: isErrorUser, isLoading: isLoadingUser },
         doFetchUser,
-    ] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/users/profiles/${id}/`, 
-        {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Token ${token}`,
-            }  
-        }
-    );
+    ] = useFetch(`${import.meta.env.VITE_API_BASE_URL}/users/profiles/${id}/`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+        },
+    });
     useEffect(() => {
         if (isAuthenticated) {
             console.log("Fetching user data...");
@@ -45,7 +37,9 @@ export default function User({ id }) {
     return (
         <div>
             {user ? (
-                <p>{user.first_name} {" "} {user.last_name}</p>
+                <p>
+                    {user.first_name} {user.last_name}
+                </p>
             ) : (
                 <p>Usuario eliminado</p>
             )}
