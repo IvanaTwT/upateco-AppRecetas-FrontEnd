@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Ingrediente from "../Ingredientes/Ingrediente";
-import IngredientesList from "../Ingredientes/IngredienteList";
+import Category from "../Categorias/Category";
 
 export default function RecetaForm() {
     const { id } = useParams();
@@ -21,7 +21,7 @@ export default function RecetaForm() {
     const [formCargado, setFormCargado] = useState(false);
     const [ingredientes, setIngredientes] = useState([]);
     const [ingredientesOfRecipe, setIngredientesOfRecipe] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [categorias, setCategorias] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
 
     const [{ data, isError, isLoading }, doFetch] = useFetch(
@@ -58,7 +58,7 @@ export default function RecetaForm() {
             });
             setImage(data.image);
             setIngredientesOfRecipe(data.ingredients);
-            setCategories(data.categories);
+            setCategorias(data.categories);
         }
     }, [data]);
 
@@ -81,9 +81,16 @@ export default function RecetaForm() {
             },
         }
     );
-
+    // funcion para agregar ingrediente cada vez
     function addIngrediente(ingrediente) {
         setIngredientes([...ingredientes, ingrediente]);
+    }
+    const [ingInitial, setIngInitial]= useState([])
+    // funcion para editar ingrediente, dentro de lista anidada tendra el objeto inical(ingrediente), y el otro sera el/los campo a modificar
+    // [ [ {} , {} ] , [ {}, {} ] .....]   de la primera tomaremos el id y el nombre para poder realizar los cambios
+    function editIngredientInitial(listIngsEdit){
+      setIngInitial([...ingInitial, listIngsEdit])
+      console.log(ingInitial)
     }
 
     useEffect(() => {
@@ -109,7 +116,7 @@ export default function RecetaForm() {
 
             setFormCargado(false);
         }
-    }, [formCargado, recipe, image, ingredientes]);
+    }, [formCargado, recipe, image, ingredientes,categorias] );
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar las recetas.</p>;
@@ -132,17 +139,17 @@ export default function RecetaForm() {
     }
 
     return (
-        <section className="section">
-            <div className="columns is-centered">
-                <div className="column is-4">
-                    <form onSubmit={handleSubmit}>
-                        <div>
-                            <figure className="image">
-                                <img src={image} alt={recipe.title} />
+        <section className="">
+            {/* <div className="columns is-centered">
+                <div className="column is-4"> */}
+                    <form onSubmit={handleSubmit} className=" is-flex is-flex-direction-column box m-4 p-4 has-background-dark">
+                        <div className="columns is-centered">
+                            <figure className="column is-one-third">
+                                <img src={image} alt={recipe.title} className="is-128x128" />
                             </figure>
                         </div>
-                        <div className="field">
-                            <label className="label">Imagen:</label>
+                        <div className="field ">
+                            <label className="label has-text-white">Imagen:</label>
                             <div className="control">
                                 <input
                                     className="input"
@@ -153,7 +160,7 @@ export default function RecetaForm() {
                             </div>
                         </div>
                         <div className="field">
-                            <label htmlFor="title" className="label">
+                            <label htmlFor="title" className="label has-text-white">
                                 Nombre receta: (*)
                             </label>
                             <div className="control">
@@ -170,13 +177,14 @@ export default function RecetaForm() {
                         </div>
 
                         <div className="field">
-                            <label htmlFor="preparation_time" className="label">
+                            <label htmlFor="preparation_time" className="label has-text-white">
                                 Tiempo Preparación (min): (*)
                             </label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     rows={3}
                                     id="preparation_time"
                                     name="preparation_time"
@@ -187,13 +195,14 @@ export default function RecetaForm() {
                         </div>
 
                         <div className="field">
-                            <label htmlFor="cooking_time" className="label">
+                            <label htmlFor="cooking_time" className="label has-text-white">
                                 Tiempo Cocción (min): (*)
                             </label>
                             <div className="control">
                                 <input
                                     className="input"
                                     type="number"
+                                    min="0"
                                     rows={3}
                                     id="cooking_time"
                                     name="cooking_time"
@@ -204,7 +213,7 @@ export default function RecetaForm() {
                         </div>
 
                         <div className="field">
-                            <label htmlFor="description" className="label">
+                            <label htmlFor="description" className="label has-text-white">
                                 Descripción:
                             </label>
                             <div className="control">
@@ -218,14 +227,13 @@ export default function RecetaForm() {
                             </div>
                         </div>
                         <div className="ingredientes">
-                            {/* <IngredientesList></IngredientesList> */}
                             <Ingrediente
                                 addIngrediente={addIngrediente}
+                                editIngredientInitial={editIngredientInitial}
                             ></Ingrediente>
                         </div>
-
                         <div className="field">
-                            <label htmlFor="servings" className="label">
+                            <label htmlFor="servings" className="label has-text-white">
                                 Raciones:
                             </label>
                             <div className="control">
@@ -233,38 +241,14 @@ export default function RecetaForm() {
                                     className="input"
                                     type="number"
                                     id="servings"
+                                    min="1"
                                     name="servings"
                                     defaultValue={recipe.servings}
                                     onChange={handleRecipeChange}
                                 />
                             </div>
-                            <div className="field">
-                                <label className="label">Categorías</label>
-                                <div className="select is-fullwidth is-multiple">
-                                    <select
-                                        multiple
-                                        size="4"
-                                        // value={selectedCategories.map((cat) => cat.id)}
-                                        // onChange={handleCategoryChange}
-                                    >
-                                        {categories.map((category) => (
-                                            <option
-                                                key={category.id}
-                                                value={category.id}
-                                            >
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                        {/* <option key="1" value="1">
-                      categoria 1
-                    </option>
-                    <option key="2" value="2">
-                      categoria 2
-                    </option> */}
-                                    </select>
-                                </div>
-                            </div>
                         </div>
+                        <Category receta={...data}></Category>
                         <div className="field">
                             <div className="control">
                                 <button
@@ -276,8 +260,8 @@ export default function RecetaForm() {
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
+                {/* </div>
+            </div> */}
         </section>
     );
 }
