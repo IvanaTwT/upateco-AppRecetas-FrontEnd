@@ -16,7 +16,8 @@ export default function RecetaPasos({ receta }) {
 
     useEffect(() => {
         if (data && receta.id) {
-            const pasosReceta = data.filter(
+            console.log(data.results)
+            const pasosReceta = data.results.filter(
                 (paso) => paso.recipe === receta.id
             );
             setPasos(pasosReceta.sort((a, b) => a.order - b.order));

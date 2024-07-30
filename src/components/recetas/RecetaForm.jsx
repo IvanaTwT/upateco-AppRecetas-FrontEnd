@@ -22,22 +22,11 @@ export default function RecetaForm() {
     const [ingredientes, setIngredientes] = useState([]);
     const [ingredientesOfRecipe, setIngredientesOfRecipe] = useState([]);
     const [categorias, setCategorias] = useState([]);
-    const [selectedCategories, setSelectedCategories] = useState([]);
+    // booleano para acceder a edit o no
+    const [paginaEdit, setPagEdit]= useState(false)
 
     const [{ data, isError, isLoading }, doFetch] = useFetch(
         `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
-        {}
-    );
-
-    const [
-        {
-            data: dataCategorias,
-            isError: isErrorCategorias,
-            isLoading: isLoadingCategorias,
-        },
-        doFetchCategorias,
-    ] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/categories/`,
         {}
     );
 
@@ -46,8 +35,6 @@ export default function RecetaForm() {
     }, []);
 
     useEffect(() => {
-        doFetchCategorias();
-
         if (data && window.location.pathname !== "/recetas/new") {
             setRecipe({
                 title: data.title || "",
@@ -56,6 +43,8 @@ export default function RecetaForm() {
                 cooking_time: data.cooking_time || "",
                 servings: data.servings || "",
             });
+            setPagEdit(!paginaEdit)
+            console.log("para editar "+paginaEdit)
             setImage(data.image);
             setIngredientesOfRecipe(data.ingredients);
             setCategorias(data.categories);
@@ -72,7 +61,7 @@ export default function RecetaForm() {
         },
     });
 
-    const [{ dataPut, isErrorPut, isLoadingPut }, doFetchPut] = useFetch(
+    const [{ data:dataPut,  isError:isErrorPut, isLoading:isLoadingPut }, doFetchPut] = useFetch(
         `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
         {
             method: "PUT",
@@ -93,6 +82,9 @@ export default function RecetaForm() {
       console.log(ingInitial)
     }
 
+    function addCategorias(categoria){
+        setCategorias([...categorias, categoria])
+    }
     useEffect(() => {
         if (formCargado) {
             const newForm = new FormData();
@@ -118,9 +110,9 @@ export default function RecetaForm() {
         }
     }, [formCargado, recipe, image, ingredientes,categorias] );
 
-    if (isLoading) return <p>Cargando...</p>;
-    if (isError) return <p>Error al cargar las recetas.</p>;
-    if (!data) return <p>No hay recetas disponibles</p>;
+    // if (isLoading) return <p>Cargando...</p>;
+    // if (isError) return <p>Error al cargar las recetas.</p>;
+    // if (!data) return <p>No hay recetas disponibles</p>;
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -144,9 +136,11 @@ export default function RecetaForm() {
                 <div className="column is-4"> */}
                     <form onSubmit={handleSubmit} className=" is-flex is-flex-direction-column box m-4 p-4 has-background-dark">
                         <div className="columns is-centered">
-                            <figure className="column is-one-third">
+                            {paginaEdit ? (
+                                <figure className="column is-one-third">
                                 <img src={image} alt={recipe.title} className="is-128x128" />
-                            </figure>
+                                </figure>
+                            ):null}
                         </div>
                         <div className="field ">
                             <label className="label has-text-white">Imagen:</label>
@@ -230,6 +224,7 @@ export default function RecetaForm() {
                             <Ingrediente
                                 addIngrediente={addIngrediente}
                                 editIngredientInitial={editIngredientInitial}
+                                paginaEdit={paginaEdit}
                             ></Ingrediente>
                         </div>
                         <div className="field">
@@ -248,7 +243,7 @@ export default function RecetaForm() {
                                 />
                             </div>
                         </div>
-                        <Category receta={...data}></Category>
+                        <Category receta={...data} addCategorias={addCategorias}></Category>
                         <div className="field">
                             <div className="control">
                                 <button

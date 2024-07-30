@@ -35,8 +35,8 @@ export default function RecetaIngrediente() {
                 .then((recipeIngredient) => {
                     //quantity, measure, ingredient (integer) recipe (integer)
                     const listIng = [];
-                    dataIngredientes.forEach((ingrediente) => {
-                        const [ing] = recipeIngredient.filter(
+                    dataIngredientes.results.forEach((ingrediente) => {
+                        const [ing] = recipeIngredient.results.filter(
                             (rp) => ingrediente.id === rp.ingredient
                         ); //devuelve lista
                         if (ing) {

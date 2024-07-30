@@ -33,9 +33,9 @@ export default function RecetaDetail() {
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar las recetas.</p>;
-    if (!data) return <p>No hay recetas disponibles</p>;
+    if (!data && data.results.length > 0) return <p>No hay recetas disponibles</p>;
 
-    const [receta] = data.filter((receta) => receta.id === parseInt(id));
+    const [receta] = data.results.filter((receta) => receta.id === parseInt(id));
 
     return (
         <section className="section">

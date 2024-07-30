@@ -34,9 +34,9 @@ export default function RecetaLocacion() {
             fetch(recipeLocacionesUrl)
                 .then((response) => response.json())
                 .then((recipeLocaciones) => {
-                    console.log("Recipe Locaciones: ", recipeLocaciones);
+                    console.log("Recipe Locaciones: ", recipeLocaciones.results);
                     const listLoc = [];
-                    dataLocaciones.forEach((locacion) => {
+                    dataLocaciones.results.forEach((locacion) => {
                         const [loc] = recipeLocaciones.filter(
                             (rp) => locacion.id === rp.location
                         );

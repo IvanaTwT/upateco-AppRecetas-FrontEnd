@@ -19,16 +19,17 @@ export default function RecetaComentario({ receta }) {
 
     useEffect(() => {
         if (data && receta.id) {
-            const comentariosReceta = data.filter(
+            const comentariosReceta = data.results.filter(
                 (comentario) => comentario.recipe === receta.id
             );
             setComentarios(comentariosReceta);
+            
         }
     }, [data, receta.id]);
 
     if (isLoading) return <p>Cargando comentarios...</p>;
     if (isError) return <p>Error al cargar los comentarios.</p>;
-
+    
     return (
         <div className="comments">
             <h3 className="title is-6">

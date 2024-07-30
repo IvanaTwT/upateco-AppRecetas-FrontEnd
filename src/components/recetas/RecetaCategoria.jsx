@@ -35,10 +35,10 @@ export default function RecetaCategoria() {
             fetch(recipeCategoriesUrl)
                 .then((response) => response.json())
                 .then((recipeCategories) => {
-                    console.log("Recipe Categories: ", recipeCategories);
+                    console.log("Recipe Categories: ", recipeCategories.results);
                     const listCat = [];
-                    dataCategories.forEach((category) => {
-                        const [cat] = recipeCategories.filter(
+                    dataCategories.results.forEach((category) => {
+                        const [cat] = recipeCategories.results.filter(
                             (rp) => category.id === rp.category
                         ); //devuelve lista
                         if (cat) {
@@ -59,7 +59,7 @@ export default function RecetaCategoria() {
         //     .then((response) => response.json())
         //     .then((data) => setCategories(data))
         //     .catch((error) => console.error('Error fetching categories:', error));
-        console.log("Data Categories: ", dataCategories);
+        // console.log("Data Categories: ", dataCategories.results);
     }, [dataCategories, id]);
 
     return (

@@ -2,7 +2,7 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function Category({receta}) {
+export default function Category({receta, addCategorias}) {
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
 
@@ -18,7 +18,7 @@ export default function Category({receta}) {
 
     useEffect(() => {
         if (categoriesData) {
-            setCategories(categoriesData);
+            setCategories(categoriesData.results);
         }
     }, [categoriesData]);
 
@@ -40,7 +40,9 @@ export default function Category({receta}) {
         const updatedSelectedCategories = categories.filter((cat) =>
             selectedOptions.includes(String(cat.id))
         );
+        console.log("??? c:"+updatedSelectedCategories)
         setSelectedCategories(updatedSelectedCategories);
+        console.log("??? s:"+selectedCategories)
     }
 
     return (
