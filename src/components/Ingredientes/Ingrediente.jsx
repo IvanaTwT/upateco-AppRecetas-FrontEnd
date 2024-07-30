@@ -39,7 +39,6 @@ export default function Ingrediente({
     const [listIng, setListIng] = useState([]);
     const [ingredientsEdit, setIngredientsEdit] = useState([]);
     
-    console.log("Ingre: "+paginaEdit)
     useEffect(() => {
         if (paginaEdit) {
             // Función asincrónica para obtener los ingredientes
@@ -116,7 +115,6 @@ export default function Ingrediente({
         if (ingrediente.name && ingrediente.quantity && ingrediente.measure) {
             addIngrediente(ingrediente); // llamada desde RecetaForm
             setIngSubmit([...ingSubmit, ingrediente]);
-
             setIngrediente({ name: "", quantity: "", measure: "" });
             setFormIngredient(false);
         } else {
@@ -138,6 +136,7 @@ export default function Ingrediente({
         console.log(ingredientsEdit); //campo modificado
         editIngredientInitial([lista, ingredientsEdit]);
     }
+    
     return (
         <div className="container is-flex is-flex-direction-column">
             <div className="is-flex is-flex-direction-row is-justify-content-space-between">
@@ -230,13 +229,13 @@ export default function Ingrediente({
                     : null}
             </div>
             {formIngredient ? (
-                <form className="form-ingredient">
+                <form className="form-ingredient" >
                     <div className="is-flex is-flex-direction-row m-1">
                         <input
                             className="input mr-1"
                             type="text"
                             name="name"
-                            defaultValue={ingrediente.name}
+                            value={ingrediente.name}
                             onChange={handleIngredientChange}
                             placeholder="Nombre"
                         />
@@ -245,7 +244,7 @@ export default function Ingrediente({
                             type="number"
                             min="1"
                             name="quantity"
-                            defaultValue={ingrediente.quantity}
+                            value={ingrediente.quantity}
                             onChange={handleIngredientChange}
                             placeholder="Cantidad"
                         />
@@ -265,8 +264,8 @@ export default function Ingrediente({
                         </div>
                         <button
                             type="submit"
-                            className="button"
-                            onClick={handleSubmitIng}
+                            className="button custom"
+                            onClick={handleSubmitIng} 
                         >
                             Agregar
                         </button>

@@ -12,23 +12,23 @@ export default function Contact() {
                 <a
                     href="https://facebook.com"
                     target="_blank"
-                    class="button is-light is-large"
+                    className="button is-light is-large"
                 >
-                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                    <i className="fab fa-facebook" aria-hidden="true"></i>
                 </a>
                 <a
                     href="https://instagram.com"
                     target="_blank"
-                    class="button is-light is-large"
+                    className="button is-light is-large"
                 >
-                    <i class="fab fa-instagram" aria-hidden="true"></i>
+                    <i className="fab fa-instagram" aria-hidden="true"></i>
                 </a>
                 <a
                     href="https://twitter.com"
                     target="_blank"
-                    class="button is-light is-large"
+                    className="button is-light is-large"
                 >
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                    <i className="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </div>
         </div>

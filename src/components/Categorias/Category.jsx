@@ -42,11 +42,12 @@ export default function Category({receta, addCategorias}) {
         );
         console.log("??? c:"+updatedSelectedCategories)
         setSelectedCategories(updatedSelectedCategories);
+        addCategorias(updatedSelectedCategories)
         console.log("??? s:"+selectedCategories)
     }
 
     return (
-        <div className="field">
+        <div className="field mb-1">
             <label className="label has-text-white">Categorías</label>
             <div className="select is-fullwidth is-multiple">
                 <select

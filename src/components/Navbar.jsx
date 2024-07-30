@@ -76,7 +76,7 @@ export default function Navbar() {
                             <div className="navbar-item">
                                 <NavLink
                                     className="navbar-link"
-                                    to="/recetas/new"
+                                    to={`../recetas/new`} relative="path"
                                 >
                                     Subir una receta
                                 </NavLink>
