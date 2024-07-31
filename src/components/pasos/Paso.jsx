@@ -15,24 +15,27 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
     const [listStep, setListStep] = useState([]);
     const [stepsEdit, setStepsEdit] = useState([]);
     
-    console.log("Ingre: "+paginaEdit)
+    const fetchSteps = async (url) => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+    
+            const pasos = data.results;
+            const stepOfRecipe = pasos.filter((step) => step.recipe === parseInt(id));
+            setListStep(stepOfRecipe)
+            setOrden(stepOfRecipe.length + 1)
+    
+            if (data.next) {
+                fetchSteps(data.next);
+            }
+        } catch (error) {
+            console.error("Error en la petición:", error);
+        }
+    };
+    
     useEffect(() => {
         if (paginaEdit) {
-            // Función asincrónica para obtener los ingredientes
-            fetch(
-                `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`,
-                {},
-            )
-            .then(response => response.json())
-            .then(data => {
-                //console.log("Pasos de receta: "+data.results)//lista de objetos [object Object],[object Object],
-                const pasos= data.results
-                const stepOfRecipe= pasos.filter((step) => step.recipe=== parseInt(id))
-                console.log("Pasos de receta: "+stepOfRecipe)
-                setListStep(stepOfRecipe)
-                setOrden(stepOfRecipe.length + 1)
-            })
-            .catch(error => console.error("Error en la petición:", error));
+            fetchSteps(`${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`);
         }
     }, [id, paginaEdit]);
 

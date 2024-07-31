@@ -148,7 +148,7 @@ export default function RecetaForm() {
         
         if (dataPost) {
             console.log("Nueva receta creada con ID:", dataPost.id); // ID de la NUEVA RECETA
-            setCategorias(categorias[categorias.length - 1]);
+            setCategorias(categorias[categorias.length - 1]); //el ultimo cambio de categoria
             console.log("Categorias reset: "+categorias)            
             if (ingredientes.length > 0) {
                 ingredientes.forEach((ingredient) => {
@@ -233,6 +233,30 @@ export default function RecetaForm() {
                         })
                         .catch(error => console.error("Error en la petición:", error));
                     }
+                });
+            }
+            if(steps.length > 0){
+                steps.forEach((paso) => {
+                    fetch(
+                        `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify({
+                                recipe: dataPost.id,
+                                order: paso.order,
+                                instruction: paso.instruction
+                            }),
+                        }
+                    ).then(response => response.json())
+                    .then(data => {
+                        if (!data.id) {
+                            console.error("Error en la creación de la step:", data);
+                        }
+                    }).catch(error => console.error("Error en la petición step:", error));
                 });
             }
             if (categorias.length > 0) {

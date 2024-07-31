@@ -114,7 +114,7 @@ export default function RecetaDetail() {
                                     <RecetaCategoria />
                                 </p>
                                 <p>
-                                    <strong> Porciones: </strong>
+                                    <strong> Porciones: {receta.servings}</strong>
                                 </p>
                             </div>
 
