@@ -103,13 +103,15 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
                                       value={step.order}
                                       style={{width:"5em"}}
                                     //   onChange={handleStepEditChange}
-                                      required
+                                    //   required
+                                      readOnly
                                   />
                                   <input
                                       className="input mr-1 column"
                                       type="text"
                                       name="instruction"
-                                      defaultValue={step.instruction}
+                                      value={step.instruction}
+                                    //   defaultValue={step.instruction}
                                       onChange={handleStepEditChange}
                                       required
                                   />
@@ -163,7 +165,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
                                     min="1"
                                     name="order"
                                     value={orden}
-                                    
+                                    readOnly
                             />
                         </div>
                         <div className="control column">
@@ -171,9 +173,11 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
                                 className="input m-1"
                                 id="instruction"
                                 name="instruction"
-                                defaultValue={paso.instruction}
+                                value={paso.instruction}
+                                // defaultValue={paso.instruction}
                                 onChange={handleStepChange}
                                 placeholder="instruction"
+                                required
                             />
                         </div>
                         

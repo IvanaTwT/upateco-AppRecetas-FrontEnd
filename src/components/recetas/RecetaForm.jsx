@@ -2,8 +2,8 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import Ingrediente from "../ingredientes/Ingrediente";
-import Category from "../categorias/Category";
+import Ingrediente from "../Ingredientes/Ingrediente";
+import Category from "../Categorias/Category";
 import Paso from "../pasos/Paso";
 
 export default function RecetaForm() {
@@ -35,6 +35,7 @@ export default function RecetaForm() {
     useEffect(() => {
         doFetch();
     }, []);
+    
     const [
         { data: dataPost, isError: isErrorPost, isLoading: isLoadingPost },
         doFetchPost,
@@ -83,6 +84,8 @@ export default function RecetaForm() {
             setImage(data.image);
             setIngredientesOfRecipe(data.ingredients);
             setCategorias(data.categories);
+            setSteps(data.steps); //YO
+            console.log("Steps:", data.steps); // Verifica el contenido de data.steps
         }
     }, [data]);
 
@@ -443,9 +446,11 @@ export default function RecetaForm() {
                     </div>
                 </div>
                 <div className="pasos">
-                <Paso addStep={addStep}
+                    <Paso
+                        addStep={addStep}
                         editStepInitial={editStepInitial}
-                        paginaEdit={paginaEdit}></Paso>
+                        paginaEdit={paginaEdit}>
+                    </Paso>
                 </div>
                
                 <div className="categories">
