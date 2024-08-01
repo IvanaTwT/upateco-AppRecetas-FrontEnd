@@ -3,26 +3,38 @@ import { useEffect, useState } from "react";
 import { formatDateTime } from "../hooks/utils";
 
 export default function RecetaPasos({ receta }) {
+    const [contador, setContador]= useState(1)
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/?page=${contador}`,
         {}
     );
 
     const [pasos, setPasos] = useState([]);
 
+    //traer todos los pasos
     useEffect(() => {
-        doFetch();
-    }, []);
-
-    useEffect(() => {
-        if (data && receta.id) {
-            console.log(data.results)
-            const pasosReceta = data.results.filter(
-                (paso) => paso.recipe === receta.id
-            );
-            setPasos(pasosReceta.sort((a, b) => a.order - b.order));
+        if(receta.id){
+            doFetch()
         }
-    }, [data, receta.id]);
+    }, [receta.id, contador]);
+
+    useEffect(()=>{
+        if(data){
+            const stepOfRecipe = data.results.filter((step) => step.recipe === receta.id);
+            
+            setPasos((prevStep) => [...prevStep, ...stepOfRecipe]);
+
+            if (data.next) {
+                setContador((sumContador) => sumContador + 1)
+            }
+        }
+    },[data])
+    //ordenar
+    useEffect(() => {
+        if (pasos && receta.id) {
+            setPasos(pasos.sort((a, b) => a.order - b.order));
+        }
+    }, [pasos, receta.id]);
 
     if (isLoading) return <p>Cargando pasos...</p>;
     if (isError) return <p>Error al cargar los pasos.</p>;
@@ -34,7 +46,7 @@ export default function RecetaPasos({ receta }) {
                 {pasos.length > 0 ? (
                     <ol>
                         {pasos.map((paso) => (
-                            <li key={paso.id}>{paso.instruction}</li>
+                            <li key={paso.id} className="m-1">{paso.instruction}</li>
                         ))}
                     </ol>
                 ) : (

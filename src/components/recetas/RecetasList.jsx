@@ -1,16 +1,32 @@
 import useFetch from "../hooks/useFetch";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import RecetaCard from "./RecetaCard";
 
 export default function RecetasList() {
+    const [contador, setContador]=useState(1)
+    const [recetas, setRecetas] = useState([]);
+    
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/?page=${contador}`,
         {}
     );
 
     useEffect(() => {
         doFetch();
-    }, []);
+    }, [contador]); // El efecto se dispara cada vez que cambia el contador
+
+    useEffect(() => {
+        if (data) {
+            // Agregar los datos recibidos a recetas
+            setRecetas((prevRecipe) => [...prevRecipe, ...data.results]);
+
+            // Si hay una siguiente página, incrementar el contador
+            if (data.next) {
+                setContador((prevContador) => prevContador + 1);
+            }
+        }
+    }, [data]);
+
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar las recetas.</p>;
@@ -18,9 +34,7 @@ export default function RecetasList() {
 
     return (
         <div className="columns is-multiline recetas">
-            {/* <div class="column is-half"></div> */}
-            {data.results.map((receta) => (
-                // is-three-quarters-mobile     is-two-thirds-tablet      is-half-desktop      is-one-third-widescreen   is-one-quarter-fullhd
+            {recetas.map((receta) => (
                 <div
                     key={receta.id}
                     className="column is-one-quarter-tablet is-two-thirds-mobile"

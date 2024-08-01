@@ -7,12 +7,13 @@ import { useParams, NavLink } from "react-router-dom";
 import "./style.css";
 
 export default function Profile() {
-    const { id } = useParams();
+    const { id } = useParams();//id del propietario
 
     const { isAuthenticated, token } = useAuth("state");
-
+    const [user, setUser]=useState({})
+    const [contador, setContador]=useState(1)
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/users/profiles/`,
+        `${import.meta.env.VITE_API_BASE_URL}/users/profiles/?page=${contador}`,
         {
             headers: {
                 "Content-Type": "application/json",
@@ -25,19 +26,31 @@ export default function Profile() {
         if (isAuthenticated) {
             doFetch();
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, contador]);
+
+    useEffect(() => {
+        if(data){
+            const [user] = data.results.filter((user) => user.user__id === parseInt(id));
+            if(user){
+                setUser(user)
+            }else{
+                if (data.next) {
+                    setContador((sumContador) => sumContador + 1)
+                }
+            }
+        }
+    }, [id, data]);
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar la información del usuario.</p>;
-
-    const [user] = data.filter((user) => user.user__id === parseInt(id));
 
     return (
         <section className="section">
             <div className="container">
                 <div className="card">
                     <div className="card-content">
-                        <div className="media">
+                        {user ? (
+                            <div className="media">
                             <div className="media-left">
                                 <figure className="image is-128x128 profile-image">
                                     <img
@@ -55,7 +68,7 @@ export default function Profile() {
                                     {user.first_name} {user.last_name}
                                 </h1>
                                 <p className="subtitle is-5">
-                                    @{user.username}
+                                    @{user.username || "No disponible"}
                                 </p>
                                 <p>
                                     <strong>Email:</strong> {user.email}
@@ -74,6 +87,7 @@ export default function Profile() {
                                 </p>
                             </div>
                         </div>
+                        ): <div>Cargando perfil...</div>}
                     </div>
                 </div>
             </div>

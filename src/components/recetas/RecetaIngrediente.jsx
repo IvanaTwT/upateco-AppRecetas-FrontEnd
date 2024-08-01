@@ -8,57 +8,77 @@ export default function RecetaIngrediente() {
     // const { isAuthenticated, token } = useAuth("state");
     const { id } = useParams();
     const [ingredients, setIngredients] = useState([]);
+    const [listIng, setListIng] = useState([]);
+    const [contador, setContador] = useState(1);
 
-    const [
-        {
-            data: dataIngredientes,
-            isError: isErrorIngredientes,
-            isLoading: isLoadingIngredientes,
-        },
-        doFetchIngredientes,
-    ] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/`,
+    const [{ data, isError, isLoading }, doFetch] = useFetch(
+        `${
+            import.meta.env.VITE_API_BASE_URL
+        }/reciperover/ingredients/?page=${contador}`,
         {}
     );
+
     const reciperIngredienteUrl = `${
         import.meta.env.VITE_API_BASE_URL
-    }/reciperover/recipes/${id}/ingredients`;
+    }/reciperover/recipes/${id}/ingredients/`;
+    const [finalizo, setFinalizo] = useState(false);
 
     useEffect(() => {
-        doFetchIngredientes();
-    }, []);
+        if (id) {
+            doFetch();
+        }
+    }, [id, contador]);
 
     useEffect(() => {
-        if (dataIngredientes) {
+        if (data) {
+            const ingOfRecipe = data.results.filter((ingredient) =>
+                ingredient.recipes.includes(parseInt(id))
+            );
+
+            setListIng((prevListIng) => [...prevListIng, ...ingOfRecipe]);
+            // Si hay una siguiente página, incrementar el contador
+            if (data.next) {
+                setContador((prevContador) => prevContador + 1);
+            } else {
+                setFinalizo(!finalizo);
+            }
+        }
+    }, [data]);
+
+    useEffect(() => {
+        if (listIng.length > 0 && finalizo) {
+            console.log("tamaño: " + listIng.length);
             fetch(reciperIngredienteUrl)
                 .then((response) => response.json())
                 .then((recipeIngredient) => {
                     //quantity, measure, ingredient (integer) recipe (integer)
-                    const listIng = [];
-                    dataIngredientes.results.forEach((ingrediente) => {
+                    const listIngredientes = [];
+                    listIng.forEach((ingrediente) => {
                         const [ing] = recipeIngredient.results.filter(
-                            (rp) => ingrediente.id === rp.ingredient
-                        ); //devuelve lista
+                            (rp) => rp.ingredient === ingrediente.id
+                        ); //
+                        // console.log("(RI): "+ing.id)
                         if (ing) {
-                            listIng.push({
+                            listIngredientes.push({
                                 id: ingrediente.id,
-                                name: ingrediente.name,
+                                name:
+                                    ingrediente.name.charAt(0).toUpperCase() +
+                                    ingrediente.name.slice(1).toLowerCase(),
                                 quantity: ing.quantity,
                                 measure: ing.measure,
                             });
                         }
                     });
-                    setIngredients(listIng);
+                    setIngredients(listIngredientes);
                 })
                 .catch((error) =>
                     console.error("Error fetching ingredients:", error)
                 );
         }
-        //   fetch(recipeCategoriasUrl)
-        //     .then((response) => response.json())
-        //     .then((data) => setCategories(data))
-        //     .catch((error) => console.error('Error fetching categories:', error));
-    }, [dataIngredientes, id]);
+    }, [listIng, id, finalizo]);
+
+    if (isLoading) return <p>Cargando...</p>;
+    if (isError) return <p>Error al cargar esta receta.</p>;
 
     return (
         <div className="column is-narrow-mobile is-narrow-tablet is-3 columna-ingredients">
