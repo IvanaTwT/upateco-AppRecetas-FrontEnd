@@ -25,7 +25,7 @@ export default function User({ id }) {
     }, [id, isAuthenticated]);
 
     useEffect(() => {
-        console.log("Data fetched:", dataUser);
+        //console.log("Data fetched:", dataUser);//datos del usuario logueado
         if (dataUser) {
             setUser(dataUser);
         }

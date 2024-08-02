@@ -14,18 +14,12 @@ import defaultImage from "./logo.png";
 
 export default function RecetaDetail() {
     const { id } = useParams();
-    // const [categories, setCategories] = useState([]);
-    const [ingredients, setIngredients] = useState([]);
 
     const { isAuthenticated, token } = useAuth("state");
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
         {}
     );
-
-    // const recipeCategoriasUrl = `${
-    //   import.meta.env.VITE_API_BASE_URL
-    // }/reciperover/recipes/${id}/categories`;
 
     useEffect(() => {
         doFetch();
@@ -33,10 +27,9 @@ export default function RecetaDetail() {
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar las recetas.</p>;
-    if (!data && data.results.length > 0) return <p>No hay recetas disponibles</p>;
+    if (!data) return <p>No hay recetas disponibles</p>;
 
-    const [receta] = data.results.filter((receta) => receta.id === parseInt(id));
-
+    const receta = data//object
     return (
         <section className="section">
             <div className="container">

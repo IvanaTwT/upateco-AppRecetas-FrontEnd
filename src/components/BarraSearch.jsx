@@ -10,8 +10,6 @@ function BarraSearch() {
                 <div className="box search-box" style={{width:"500px"}}>
                   <h2 className="title">¿Qué te gustaría cocinar?</h2>
                   <form className="">
-                      {/* <input type="text" placeholder="Buscar..." />
-                      <button type="submit">Buscar</button> */}
                       <div className="is-flex is-align-items-center is-justify-content-center field has-addons">
                       <div className="control is-expanded">{/* is-expanded */}
                         <input className="button input  input-image"  type="text" placeholder="Buscar..." />

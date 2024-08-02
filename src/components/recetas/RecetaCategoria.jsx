@@ -6,8 +6,7 @@ import { useParams, NavLink } from "react-router-dom";
 
 export default function RecetaCategoria() {
     // const { isAuthenticated, token } = useAuth("state");
-    const { id } = useParams();
-    console.log("ID: ", id);
+    const { id } = useParams();//id de receta
     const [categories, setCategories] = useState([]);
 
     const [
@@ -35,7 +34,7 @@ export default function RecetaCategoria() {
             fetch(recipeCategoriesUrl)
                 .then((response) => response.json())
                 .then((recipeCategories) => {
-                    console.log("Recipe Categories: ", recipeCategories.results);
+                    // console.log("Recipe Categories: ", recipeCategories.results); //lista
                     const listCat = [];
                     dataCategories.results.forEach((category) => {
                         const [cat] = recipeCategories.results.filter(
@@ -48,7 +47,7 @@ export default function RecetaCategoria() {
                             });
                         }
                     });
-                    console.log("Filtered Categories: ", listCat);
+                    //console.log("Filtered Categories: ", listCat);//categorias de esta receta
                     setCategories(listCat);
                 })
                 .catch((error) =>

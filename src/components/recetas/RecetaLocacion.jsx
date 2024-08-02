@@ -5,8 +5,7 @@ import "./style.css";
 import { useParams, NavLink } from "react-router-dom";
 
 export default function RecetaLocacion() {
-    const { id } = useParams();
-    console.log("ID: ", id);
+    const { id } = useParams();//id de receta
     const [locaciones, setLocaciones] = useState([]);
 
     const [
