@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-// import IngredientesList from "./IngredienteList";
+import {  useParams } from "react-router-dom";
 
 export default function Ingrediente({
     addIngrediente,
     editIngredientInitial,
     paginaEdit,
 }) {
-    const navigate = useNavigate();
     const { id } = useParams();
     const [ingSubmit, setIngSubmit] = useState([]);
     const [ingrediente, setIngrediente] = useState({

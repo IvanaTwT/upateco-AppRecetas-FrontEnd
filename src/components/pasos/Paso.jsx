@@ -54,6 +54,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
     function handleSubmitPaso(event) {
         // event.stopPropagation();
         event.preventDefault();
+        console.log(paso)
         addStep(paso); // llamada desde RecetaForm
         setPasoSubmit([...pasoSubmit, paso]); //array para ir mostrando
         setPaso({ order: orden+1, instruction: "" });

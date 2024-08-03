@@ -8,14 +8,25 @@ import RecetaForm from "../components/recetas/RecetaForm";
 import Profile from "../components/recetas/Profile";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "../components/Auth/Login";
-
+import RecetasList from "../components/recetas/RecetasList"
 const Router = createBrowserRouter([
     {
         element: <Layout />,
         children: [
             {
                 path: "/",
-                element: <Home />,
+                children: [
+                    {
+                        index: true,
+                        element: <Home />,
+                    },
+                    {
+                        path: "categories/:id",
+                        element: (
+                            <RecetasList/>
+                        ),
+                    }
+                ]
             },
             {
                 path: "/login",

@@ -80,12 +80,12 @@ export default function RecetaForm() {
                 servings: data.servings || "",
             });
             setPagEdit(!paginaEdit);
-            console.log("para editar " + paginaEdit);
+            // console.log("para editar " + paginaEdit);
             setImage(data.image);
             setIngredientesOfRecipe(data.ingredients);
             setCategorias(data.categories);
-            setSteps(data.steps); //YO
-            console.log("Steps:", data.steps); // Verifica el contenido de data.steps
+            // setSteps(data.steps); //YO
+            // console.log("Steps:", data.steps); // Verifica el contenido de data.steps
         }
     }, [data]);
 
@@ -104,7 +104,8 @@ export default function RecetaForm() {
     // PASO - funcion para agregar paso cada vez
     function addStep(step) {
         console.log("Pasos (RF)"+steps)
-        setSteps([...steps, step]);
+        // setSteps([...steps, step]);
+        setSteps((prevStep) => [...prevStep, step]);
     }
     const [stepInitial, setStepInitial] = useState([]);
     // funcion para editar ingrediente, dentro de lista anidada tendra el objeto inical(ingrediente), y el otro sera el/los campo a modificar
@@ -422,13 +423,6 @@ export default function RecetaForm() {
                         />
                     </div>
                 </div>
-                <div className="ingredientes">
-                    <Ingrediente
-                        addIngrediente={addIngrediente}
-                        editIngredientInitial={editIngredientInitial}
-                        paginaEdit={paginaEdit}
-                    ></Ingrediente>
-                </div>
                 <div className="field">
                     <label htmlFor="servings" className="label has-text-white">
                         Raciones:
@@ -445,6 +439,14 @@ export default function RecetaForm() {
                         />
                     </div>
                 </div>
+                <div className="ingredientes">
+                    <Ingrediente
+                        addIngrediente={addIngrediente}
+                        editIngredientInitial={editIngredientInitial}
+                        paginaEdit={paginaEdit}
+                    ></Ingrediente>
+                </div>
+                
                 <div className="pasos">
                     <Paso
                         addStep={addStep}
