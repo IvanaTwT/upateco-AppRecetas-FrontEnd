@@ -4,8 +4,12 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatDate, formatDateTime } from "../hooks/utils";
 import User from "./User";
 import { useParams, NavLink } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function RecetaComentario({ receta }) {
+
+    const { user__id } = useAuth("state");
+    const { isAuthenticated, token } = useAuth("state");
 
     const [contador, setContador] = useState(1)
     const [comentarios, setComentarios] = useState([]);
@@ -38,6 +42,48 @@ export default function RecetaComentario({ receta }) {
         }
     }, [data, receta.id]);
 
+    const handleDelete = (comentarioId) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminarlo!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/reciperover/comments/${comentarioId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Token ${token}`
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        setComentarios(prevComentarios => prevComentarios.filter(comentario => comentario.id !== comentarioId));
+                        Swal.fire(
+                            'Eliminado!',
+                            'El comentario ha sido eliminado.',
+                            'success'
+                        );
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            'Hubo un problema al eliminar el comentario.',
+                            'error'
+                        );
+                    }
+                }).catch(() => {
+                    Swal.fire(
+                        'Error!',
+                        'Hubo un problema al eliminar el comentario.',
+                        'error'
+                    );
+                });
+            }
+        });
+    };
+
     if (isLoading) return <p>Cargando comentarios...</p>;
     if (isError) return <p>Error al cargar los comentarios.</p>;
     
@@ -48,11 +94,15 @@ export default function RecetaComentario({ receta }) {
             </h3>
             {comentarios.length > 0 ? (
                 comentarios.map((comentario) => (
+                    
                     <div key={comentario.id} className="box">
+
                         <div className="media">
+
                             <div className="media-left">
                                 <ion-icon name="person" size="large"></ion-icon>
                             </div>
+
                             <div className="media-content">
                                 <p className="title is-6">
                                     <NavLink to={`../../profile/${comentario.author}`} relative="path">
@@ -66,6 +116,19 @@ export default function RecetaComentario({ receta }) {
                                     </small>
                                 </p>
                             </div>
+
+                            {isAuthenticated && comentario.author == user__id ? (
+                                <div className="media-right is-flex is-justify-content-start is-align-items-center">      
+                                    <div className="buttons-container is-flex"> 
+                                        <div className="column">
+                                            <button className="button is-danger" onClick={() => handleDelete(comentario.id)}>
+                                                <ion-icon name="trash-outline"></ion-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : null}
+
                         </div>
                     </div>
                 ))
