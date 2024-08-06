@@ -1,18 +1,27 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "./recetas/logo.png";
 import { useAuth } from "./contexts/AuthContext";
+import User from "./recetas/User";
 
 export default function Navbar() {
-    const { isAuthenticated, token } = useAuth("state");
+    const { isAuthenticated } = useAuth("state");
+    const { user__id } = useAuth("state");
+    const { logout } = useAuth("actions");
     const [isActive, setIsActive] = useState(false);
+    const navigate = useNavigate();
 
     const toggleNavbar = () => {
         setIsActive(!isActive);
     };
 
     const handleLogout = () => {
-        actions.logout();
+        logout();
+        setIsActive(false);
+        navigate("/");
+    };
+
+    const closeNavbar = () => {
         setIsActive(false);
     };
 
@@ -43,15 +52,15 @@ export default function Navbar() {
 
                 <div id="navbarBasicExample" className={`navbar-menu ${isActive ? "is-active" : ""}`}>
                     <div className="navbar-start">
-                        <NavLink to="/" className="navbar-item">
+                        <NavLink to="/" className="navbar-item" onClick={closeNavbar}>
                             Home
                         </NavLink>
 
-                        <NavLink to="/recetas" className="navbar-item">
+                        <NavLink to="/recetas" className="navbar-item" onClick={closeNavbar}>
                             Recetas
                         </NavLink>
 
-                        <NavLink to="/contact" className=" navbar-item">
+                        <NavLink to="/contact" className=" navbar-item" onClick={closeNavbar}>
                             Contacto
                         </NavLink>
                     </div>
@@ -59,11 +68,13 @@ export default function Navbar() {
                     <div className="navbar-end">
                         {isAuthenticated ? (
                             <div className="navbar-item has-text-white">
-                                BIENVENIDA/O!
+                                HOLA
+                                <span>&nbsp;</span>
+                                <User id={user__id} showFullName={false}/>!
                             </div>
                         ) : (
                             <div className="navbar-item">
-                                <NavLink to="/login" className="has-text-white">
+                                <NavLink to="/login" className="has-text-white" onClick={closeNavbar}>
                                     CONÉCTATE
                                 </NavLink>
                             </div>
@@ -87,38 +98,32 @@ export default function Navbar() {
                             </div>
 
                             <div className="navbar-dropdown is-right">
-                                {/* <div className="navbar-item">
-                                <NavLink className="navbar-link " to={`../profile/${user.id}`} relative="path">
-                                    Mi Perfil
-                                </NavLink>
-                            </div> */}
-
+                            {isAuthenticated ? (
                                 <div className="navbar-item">
-                                    <NavLink className="navbar-link " to="/">
+                                    <NavLink className="navbar-link " to={`../profile/${user__id}`} relative="path" onClick={closeNavbar}>
+                                        Mi Perfil
+                                    </NavLink>
+                                </div>
+                            ) : null}       
+                                <div className="navbar-item">
+                                    <NavLink className="navbar-link " to="../recetas/mis-recetas" onClick={closeNavbar}>
                                         Mis recetas
                                     </NavLink>
                                 </div>
                                 <div className="navbar-item">
-                                    <NavLink
-                                        className="navbar-link"
-                                        to={`../recetas/new`} relative="path"
-                                    >
+                                    <NavLink className="navbar-link" to={`../recetas/new`} relative="path" onClick={closeNavbar}>
                                         Subir una receta
                                     </NavLink>
                                 </div>
                                 <hr className="navbar-divider" />
                                 {!isAuthenticated ? (
-                                    <NavLink className="navbar-item" to="/login">
+                                    <NavLink className="navbar-item" to="/login" onClick={closeNavbar}>
                                         <button className="button custom">
                                             Iniciar sesión
                                         </button>
                                     </NavLink>
                                 ) : (
-                                    <Link
-                                        to="#"
-                                        className="navbar-item"
-                                        onClick={handleLogout}
-                                    >
+                                    <Link to="#" className="navbar-item" onClick={handleLogout}>
                                         Cerrar sesión
                                     </Link>
                                 )}

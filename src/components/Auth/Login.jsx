@@ -1,43 +1,77 @@
-import { useState, useEffect } from "react";
-import useFetch from "../hooks/useFetch";
+import { useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 function Login() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [triggerFetch, setTriggerFetch] = useState(false);
-
-    const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api-auth/`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, password }),
-        }
-        //triggerFetch
-    );
+    const usernameRef = useRef("");
+    const passwordRef = useRef("");
+    const [isError, setIsError] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { login } = useAuth("actions");
 
     function handleSubmit(event) {
         event.preventDefault();
-        setTriggerFetch(true);
-        doFetch();
-    }
-
-    function handleChange(event) {
-        const { name, value } = event.target;
-        if (name === "username") setUsername(value);
-        if (name === "password") setPassword(value);
-    }
-
-    useEffect(() => {
-        if (data && !isError && triggerFetch) {
-            login(data.token);
+        if (!isLoading) {
+            setIsLoading(true);
+            fetch(`${import.meta.env.VITE_API_BASE_URL}/api-auth/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: usernameRef.current.value,
+                    password: passwordRef.current.value,
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("No se pudo iniciar sesión");
+                    }
+                    return response.json();
+                })
+                .then((responseData) => {
+                    login(responseData.token);
+                    if (responseData.token) {
+                        fetch(
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/users/profiles/profile_data/`,
+                            {
+                                method: "GET",
+                                headers: {
+                                    Authorization: `Token ${responseData.token}`,
+                                },
+                            }
+                        )
+                            .then((profileResponse) => {
+                                if (!profileResponse.ok) {
+                                    throw new Error(
+                                        "Error al obtener id de usuario"
+                                    );
+                                }
+                                return profileResponse.json();
+                            })
+                            .then((profileData) =>
+                                login(responseData.token, profileData.user__id)
+                            )
+                            .catch((error) => {
+                                console.error(
+                                    "Error al obtener id de usuario",
+                                    error
+                                );
+                                setIsError(true);
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error error al iniciar sesión", error);
+                    setIsError(true);
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         }
-    }, [data, isError, triggerFetch]);
+    }
 
     return (
         <section className="section">
@@ -52,8 +86,7 @@ function Login() {
                                     type="text"
                                     id="username"
                                     name="username"
-                                    value={username}
-                                    onChange={handleChange}
+                                    ref={usernameRef}
                                 />
                                 <span className="icon is-small is-left">
                                     <i className="fas fa-user"></i>
@@ -68,8 +101,7 @@ function Login() {
                                     type="password"
                                     id="password"
                                     name="password"
-                                    value={password}
-                                    onChange={handleChange}
+                                    ref={passwordRef}
                                 />
                                 <span className="icon is-small is-left">
                                     <i className="fas fa-lock"></i>
@@ -84,15 +116,8 @@ function Login() {
                                 >
                                     Enviar
                                 </button>
-                                {isLoading && triggerFetch && (
-                                    <p>Cargando...</p>
-                                )}
-                                {isError && (
-                                    <p>Usuario o contraseña incorrectos</p>
-                                )}
-                                {data && (
-                                    <p>{`Token obtenido: ${data.token}`}</p>
-                                )}
+                                {isLoading && <p>Cargando...</p>}
+                                {isError && <p>Error al cargar los datos.</p>}
                             </div>
                         </div>
                     </form>

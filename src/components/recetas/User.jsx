@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "./style.css";
 
-export default function User({ id }) {
+export default function User({ id, showFullName = true }) {
     const { isAuthenticated, token } = useAuth("state");
     const [user, setUser] = useState(null);
 
@@ -17,6 +17,7 @@ export default function User({ id }) {
             Authorization: `Token ${token}`,
         },
     });
+
     useEffect(() => {
         if (isAuthenticated) {
             console.log("Fetching user data...");
@@ -25,7 +26,6 @@ export default function User({ id }) {
     }, [id, isAuthenticated]);
 
     useEffect(() => {
-        //console.log("Data fetched:", dataUser);//datos del usuario logueado
         if (dataUser) {
             setUser(dataUser);
         }
@@ -38,7 +38,11 @@ export default function User({ id }) {
         <div>
             {user ? (
                 <p>
-                    {user.first_name} {user.last_name}
+                    {showFullName ? (
+                        `${user.first_name} ${user.last_name}`
+                    ) : (
+                        user.first_name
+                    )}
                 </p>
             ) : (
                 <p>Usuario eliminado</p>

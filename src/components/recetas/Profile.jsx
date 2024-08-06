@@ -7,11 +7,12 @@ import { useParams, NavLink } from "react-router-dom";
 import "./style.css";
 
 export default function Profile() {
-    const { id } = useParams();//id del propietario
+    const { id } = useParams();
 
     const { isAuthenticated, token } = useAuth("state");
-    const [user, setUser]=useState({})
-    const [contador, setContador]=useState(1)
+    const [user, setUser] = useState({})
+    const [contador, setContador] = useState(1)
+    
     const [{ data, isError, isLoading }, doFetch] = useFetch(
         `${import.meta.env.VITE_API_BASE_URL}/users/profiles/?page=${contador}`,
         {

@@ -9,6 +9,8 @@ import Profile from "../components/recetas/Profile";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "../components/Auth/Login";
 import RecetasList from "../components/recetas/RecetasList"
+import RecetasMias from "../components/recetas/RecetasMias"
+
 const Router = createBrowserRouter([
     {
         element: <Layout />,
@@ -68,6 +70,14 @@ const Router = createBrowserRouter([
                         element: (
                             <ProtectedRoute>
                                 <RecetaForm />
+                            </ProtectedRoute>
+                        ),
+                    },
+                    {
+                        path: "mis-recetas",
+                        element: (
+                            <ProtectedRoute>
+                                <RecetasMias />
                             </ProtectedRoute>
                         ),
                     },
