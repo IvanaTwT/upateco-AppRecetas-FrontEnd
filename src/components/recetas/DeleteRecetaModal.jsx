@@ -1,5 +1,6 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
+import Swal from "sweetalert2";
 
 function DeleteRecetaModal({ isOpen, onClose, receta_id, onDelete }) {
     const { token } = useAuth("state");
@@ -15,7 +16,15 @@ function DeleteRecetaModal({ isOpen, onClose, receta_id, onDelete }) {
                     Authorization: `Token ${token}`,
                 },
             }
-        );
+        ).then(response => {
+            if (!response.ok) {
+                throw new Error('Error al eliminar la canción');
+            }
+            return response.json();
+        }).catch(error => {
+            Swal.showValidationMessage(`Error: ${error}`);
+        });
+        console.log("Receta eliminada: ", receta_id)
     };
 
     useEffect(() => {
@@ -24,10 +33,12 @@ function DeleteRecetaModal({ isOpen, onClose, receta_id, onDelete }) {
         }
     }, [onDelete.data]);
 
+    console.log("Receta eliminada:", receta_id)
+    console.log("isOpen:", isOpen);
     if (!isOpen) return null;
 
     return (
-        <div className={`modal ${isOpen ? "is-active" : ""}`}>
+        <div >
             <div className="modal-background" onClick={onClose}></div>
             <div className="modal-card">
                 <header className="modal-card-head">
@@ -57,6 +68,7 @@ function DeleteRecetaModal({ isOpen, onClose, receta_id, onDelete }) {
                 </section>
             </div>
         </div>
+
     );
 }
 

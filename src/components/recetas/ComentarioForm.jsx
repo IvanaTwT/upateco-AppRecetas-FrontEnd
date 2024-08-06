@@ -7,7 +7,7 @@ export default function ComentarioForm({ recetaId }) {
     const [content, setContent] = useState("");
 
     const [{ isError, isLoading }, doFetch] = useFetch(
-        "https://sandbox.academiadevelopers.com/reciperover/comments/",
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/comments/`,
         {
             method: "POST",
             headers: {
@@ -30,6 +30,7 @@ export default function ComentarioForm({ recetaId }) {
             }),
         });
         console.log("Contenido comments: " + content);
+        console.log("Receta: " + recetaId);
         setContent("");
     }
 
@@ -59,7 +60,7 @@ export default function ComentarioForm({ recetaId }) {
                 </div>
                 <div className="field">
                     <div className="control">
-                        <button type="submit" className="button is-primary">
+                        <button type="submit" className="button is-primary" disabled={content.trim() === ""}>
                             Calificar
                         </button>
                     </div>

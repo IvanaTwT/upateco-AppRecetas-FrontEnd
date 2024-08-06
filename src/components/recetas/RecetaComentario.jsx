@@ -6,24 +6,35 @@ import User from "./User";
 import { useParams, NavLink } from "react-router-dom";
 
 export default function RecetaComentario({ receta }) {
+
+    const [contador, setContador] = useState(1)
+    const [comentarios, setComentarios] = useState([]);
+
     const [{ data, isError, isLoading }, doFetch] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/comments/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/comments/?page=${contador}`,
         {}
     );
 
-    const [comentarios, setComentarios] = useState([]);
-
     useEffect(() => {
         doFetch();
-    }, []);
+    }, [contador]);
 
     useEffect(() => {
-        if (data && receta.id) {
-            const comentariosReceta = data.results.filter(
-                (comentario) => comentario.recipe === receta.id
-            );
-            setComentarios(comentariosReceta);
-            
+        if (data) {
+            if(receta.id){
+                const comentariosReceta = data.results.filter(
+                    (comentario) => comentario.recipe === receta.id,
+                );
+                comentariosReceta.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                setComentarios((prevRecipe) => [...prevRecipe, ...comentariosReceta]);
+            }
+
+            setComentarios((prevRecipes) => [...prevRecipes]);
+
+            if (data.next) {
+                setContador((prevContador) => prevContador + 1);
+            }
+           
         }
     }, [data, receta.id]);
 
@@ -44,11 +55,8 @@ export default function RecetaComentario({ receta }) {
                             </div>
                             <div className="media-content">
                                 <p className="title is-6">
-                                    <NavLink
-                                        to={`../../profile/${receta.owner}`}
-                                        relative="path"
-                                    >
-                                        <User id={receta.owner} />
+                                    <NavLink to={`../../profile/${comentario.author}`} relative="path">
+                                        <User id={comentario.author} />
                                     </NavLink>
                                 </p>
                                 <p>{comentario.content}</p>
