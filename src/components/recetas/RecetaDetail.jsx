@@ -33,127 +33,129 @@ export default function RecetaDetail() {
     if (isError) return <p>Error al cargar las recetas.</p>;
     if (!data) return <p>No hay recetas disponibles</p>;
 
-    const receta = data
+    const receta = data;
     return (
         <section className="section">
             <div className="container">
-                <div className="card columns">
-                    {/* imagen */}
-                    <div className="column">
-                        <div className="media-left">
-                            <figure className="image is-square">
-                                <img
-                                    src={
-                                        receta.image
-                                            ? receta.image
-                                            : defaultImage
-                                    }
-                                    alt={receta.title}
-                                />
-                            </figure>
-                        </div>
-                    </div>
-                    {/* info imagen */}
-                    <div className="column">
-                        <div className="media-content">
-                            <div className="card-content">
-                                <h2 className="title is-3">{receta.title}</h2>
+                <div className="card">
+                    <div className=" is-flex is-justify-content-flex-end is-align-items-flex-end">
+                        {isAuthenticated && receta.owner == user__id ? (
+                            <div className="buttons-container is-flex is-justify-content-start is-align-items-center">
+                                <NavLink to={`../edit/${id}`} relative="path">
+                                    <button className="button is-info">
+                                        <ion-icon name="create-outline"></ion-icon>
+                                    </button>
+                                </NavLink>
 
-                                {isAuthenticated && receta.owner == user__id ? (
-                                    <div className="media-right is-flex is-justify-content-start is-align-items-center">
-                                        
-                                        <div className="buttons-container is-flex">
-
-                                            <NavLink to={`../edit/${id}`} relative="path">
-                                                <button className="button is-light">
-                                                    <ion-icon name="create-outline"></ion-icon>
-                                                </button>
-                                            </NavLink>
-                                            
-                                            <div className="column" onClick={() => setIsModalOpen(true)}>
-                                                <button className="button is-danger">
-                                                    <ion-icon name="trash-outline"></ion-icon>
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                ) : null}
-
-                                {isModalOpen ? (
-                                    <DeleteRecetaModal
-                                        isOpen={isModalOpen}
-                                        onClose={() => setIsModalOpen(false)}
-                                        receta_id={id}
-                                        onDelete={{ data, isLoading, isError, doFetch }}
-                                    />
-                                ) : null}
-
-                                <hr className="hr" />
-                                <div className="is-flex is-align-items-center">
-                                    <p className="mr-6">
-                                        <ion-icon name="people"></ion-icon>
-                                        Vistas: {receta.view_count}
-                                    </p>
-                                    <p className="mr-6">
-                                        <ion-icon name="restaurant"></ion-icon>
-                                        Preparación: {
-                                            receta.preparation_time
-                                        }{" "}
-                                        mins
-                                    </p>
-                                    <p className="mr-6">
-                                        <ion-icon name="time"></ion-icon>
-                                        Cocción: {receta.cooking_time} mins
-                                    </p>
+                                <div
+                                    className="column"
+                                    onClick={() => setIsModalOpen(true)}
+                                >
+                                    <button className="button is-danger">
+                                        <ion-icon name="trash-outline"></ion-icon>
+                                    </button>
                                 </div>
-                                <hr className="hr" />
-                                <div className="content">
-                                    {receta.description}
-                                </div>
-
-                                <p>
-                                    <strong>Locaciones:</strong>{" "}
-                                    <RecetaLocacion />
-                                </p>
-                                <p>
-                                    <strong>Categorías:</strong>{" "}
-                                    <RecetaCategoria />
-                                </p>
-                                <p>
-                                    <strong> Porciones: {receta.servings}</strong>
-                                </p>
                             </div>
+                        ) : null}
+                        {isModalOpen ? (
+                            <DeleteRecetaModal
+                                isOpen={isModalOpen}
+                                onClose={() => setIsModalOpen(false)}
+                                receta_id={id}
+                                onDelete={{ data, isLoading, isError, doFetch }}
+                            />
+                        ) : null}
+                    </div>
+                    <div className="columns m-1">
+                        {/* imagen */}
+                        <div className="column">
+                            <div className="media-left">
+                                <figure className="image is-square">
+                                    <img
+                                        src={
+                                            receta.image
+                                                ? receta.image
+                                                : defaultImage
+                                        }
+                                        alt={receta.title}
+                                    />
+                                </figure>
+                            </div>
+                        </div>
+                        {/* info imagen */}
+                        <div className="column">
+                            <div className="media-content">
+                                <div className="card-content">
+                                    <h2 className="title is-3">
+                                        {receta.title}
+                                    </h2>
 
-                            <footer className="card-footer mt-auto">
-                                <div className="card-footer-item has-text-centered is-flex is-justify-content-center">
+                                    <hr className="hr" />
+                                    <div className="is-flex is-align-items-center">
+                                        <p className="mr-6">
+                                            <ion-icon name="people"></ion-icon>
+                                            Vistas: {receta.view_count}
+                                        </p>
+                                        <p className="mr-6">
+                                            <ion-icon name="restaurant"></ion-icon>
+                                            Preparación:{" "}
+                                            {receta.preparation_time} mins
+                                        </p>
+                                        <p className="mr-6">
+                                            <ion-icon name="time"></ion-icon>
+                                            Cocción: {receta.cooking_time} mins
+                                        </p>
+                                    </div>
+                                    <hr className="hr" />
+                                    <div className="content">
+                                        {receta.description}
+                                    </div>
+
                                     <p>
-                                        <strong>Autor: </strong>
-                                        <NavLink
-                                            to={`../../profile/${receta.owner}`}
-                                            relative="path"
-                                        >
-                                            <User id={receta.owner} />
-                                        </NavLink>
+                                        <strong>Locaciones:</strong>{" "}
+                                        <RecetaLocacion />
+                                    </p>
+                                    <p>
+                                        <strong>Categorías:</strong>{" "}
+                                        <RecetaCategoria />
+                                    </p>
+                                    <p>
+                                        <strong>
+                                            {" "}
+                                            Porciones: {receta.servings}
+                                        </strong>
                                     </p>
                                 </div>
-                                <div className="card-footer-item">
-                                    <p>
-                                        <strong>Publicada:</strong>{" "}
-                                        {formatDate(receta.created_at)}
-                                    </p>
-                                </div>
-                                <div className="card-footer-item">
-                                    <p>
-                                        <strong>Actualizada:</strong>{" "}
-                                        {formatDate(receta.updated_at)}
-                                    </p>
-                                </div>
-                            </footer>
+
+                                <footer className="card-footer mt-auto">
+                                    <div className="card-footer-item has-text-centered is-flex is-justify-content-center">
+                                        <p>
+                                            <strong>Autor: </strong>
+                                            <NavLink
+                                                to={`../../profile/${receta.owner}`}
+                                                relative="path"
+                                            >
+                                                <User id={receta.owner} />
+                                            </NavLink>
+                                        </p>
+                                    </div>
+                                    <div className="card-footer-item">
+                                        <p>
+                                            <strong>Publicada:</strong>{" "}
+                                            {formatDate(receta.created_at)}
+                                        </p>
+                                    </div>
+                                    <div className="card-footer-item">
+                                        <p>
+                                            <strong>Actualizada:</strong>{" "}
+                                            {formatDate(receta.updated_at)}
+                                        </p>
+                                    </div>
+                                </footer>
+                            </div>
                         </div>
                     </div>
                 </div>
-
                 <div className="card ">
                     <div className="card-content">
                         <div className="columns is-multiline">

@@ -5,6 +5,7 @@ export default function Ingrediente({
     addIngrediente,
     editIngredientInitial,
     paginaEdit,
+    deleteIngredients
 }) {
     const { id } = useParams();
     const [ingSubmit, setIngSubmit] = useState([]);
@@ -13,6 +14,9 @@ export default function Ingrediente({
         quantity: null,
         measure: "",
     });
+    // ediciones para los ingredientes anteriores
+    const [listIng, setListIng] = useState([]);
+    const [ingredientsEdit, setIngredientsEdit] = useState([]);
 
     const [formIngredient, setFormIngredient] = useState(false);
 
@@ -31,11 +35,7 @@ export default function Ingrediente({
         "pkgs",
         "pinch",
         "bunch",
-    ];
-
-    // ediciones para los ingredientes anteriores
-    const [listIng, setListIng] = useState([]);
-    const [ingredientsEdit, setIngredientsEdit] = useState([]);
+    ];    
     
     useEffect(() => {
         if (paginaEdit) {
@@ -53,9 +53,7 @@ export default function Ingrediente({
                             "No se pudieron cargar los ingredientes"
                         );
                     }
-
                     const data = await response.json();
-
                     // Obtener todos los detalles de los ingredientes en paralelo
                     const ingredientPromises = data.results.map(
                         async (ingR) => {
@@ -64,28 +62,26 @@ export default function Ingrediente({
                                     import.meta.env.VITE_API_BASE_URL
                                 }/reciperover/ingredients/${ingR.ingredient}/`
                             );
-
                             if (!response.ok) {
                                 throw new Error(
                                     "No se pudo traer el ingrediente"
                                 );
                             }
-
                             const ing = await response.json();
                             return {
-                                id: ing.id,
+                                id:ingR.id,
+                                ingredient: ing.id,
                                 name: ing.name,
                                 quantity: ingR.quantity,
                                 measure: ingR.measure,
                             };
                         }
                     );
-
                     // Esperar a que todas las promesas se resuelvan
                     const ingredientsList = await Promise.all(
                         ingredientPromises
                     );
-                    setListIng(ingredientsList);
+                    setListIng(ingredientsList);//agregar los ingredientes a la lista
                 } catch (error) {
                     console.error("Error al realizar la petición", error);
                 }
@@ -127,11 +123,19 @@ export default function Ingrediente({
             [event.target.name]: event.target.value,
         });
     }
-    function onClickEditIng(id, event) {
+    function handleOnClickDelete(idEliminado){//
+        // console.log("id ing: (I): "+idEliminado)
+        const listaUpdate=listIng.filter(ing => ing.id !== parseInt(idEliminado))
+        // console.log(listaUpdate)
+        setListIng(listaUpdate)//actualizando lista de ingredientes        
+        deleteIngredients(idEliminado)//mandamos el id a RecetaForm
+    }
+    function handleOnClickEditIng(id, event) {
         // para modicar un ingrediente debo de tener el nombre del ingrediente, y en la tabla intermedia el id
         const [lista] = listIng.filter((ing) => ing.id === id);
-        console.log(lista); //ingrediente inicial
-        console.log(ingredientsEdit); //campo modificado
+        // console.log(listIng)// all ingredientes
+        //console.log(lista); //ingrediente inicial
+        //console.log(ingredientsEdit); //campo modificado
         editIngredientInitial([lista, ingredientsEdit]);
     }
     
@@ -187,11 +191,17 @@ export default function Ingrediente({
                                       ))}
                                   </select>
                                   <p
-                                      onClick={() => onClickEditIng(ing.id)}
-                                      className="button is-info"
+                                      onClick={() => handleOnClickEditIng(ing.id)}
+                                      className="button is-info mr-1"
                                   >
-                                      {" "}
                                       <ion-icon name="create-outline"></ion-icon>
+                                  </p>
+                                  <p
+                                      onClick={() => handleOnClickDelete(ing.id)}
+                                      className="button is-danger"
+                                  >
+                                      
+                                      <ion-icon name="trash-outline"></ion-icon>
                                   </p>
                               </div>
                           ))

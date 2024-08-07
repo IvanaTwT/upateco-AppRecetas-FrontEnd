@@ -2,7 +2,8 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function Category({receta, addCategorias}) {
+export default function Category({receta, addCategorias, paginaEdit}) {
+    const {id}= useParams()
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
 
@@ -11,6 +12,7 @@ export default function Category({receta, addCategorias}) {
         `${import.meta.env.VITE_API_BASE_URL}/reciperover/categories/`,
         {}
     );
+
 
     useEffect(() => {
         doFetchCategories();
@@ -40,10 +42,9 @@ export default function Category({receta, addCategorias}) {
         const updatedSelectedCategories = categories.filter((cat) =>
             selectedOptions.includes(String(cat.id))
         );
-        console.log("??? c:"+updatedSelectedCategories)
-        setSelectedCategories(updatedSelectedCategories);
-        addCategorias(updatedSelectedCategories)
-        console.log("??? s:"+selectedCategories)
+        console.log("??? c:"+updatedSelectedCategories)//actualizacion de categorias seleccionadas
+        setSelectedCategories(updatedSelectedCategories);//selecciona las categorias al select
+        addCategorias(updatedSelectedCategories)//agrega las categorias
     }
 
     return (

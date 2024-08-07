@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import useFetch from "../hooks/useFetch";
 // import IngredientesList from "./IngredienteList";
 
-export default function Paso({addStep, paginaEdit, editStepInitial,}) {
+export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) {
     
     const { id } = useParams();
     const [pasoSubmit, setPasoSubmit] = useState([]);
     const [orden, setOrden]=useState(1); 
-    const [paso, setPaso] = useState({order: 1, instruction: ""}); //
+    const [paso, setPaso] = useState({order:1 , instruction : ""}); //
+    const [page, setPage]= useState(1);
 
     const [formPaso, setFormPaso] = useState(false);
 
@@ -15,29 +17,39 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
     const [listStep, setListStep] = useState([]);
     const [stepsEdit, setStepsEdit] = useState([]);
     
-    const fetchSteps = async (url) => {
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-    
+    const [{ data, isError, isLoading }, doFetchStep] = useFetch(
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/?page=${page}`,
+        {}
+      );
+
+    useEffect(()=>{
+        if(id){
+            doFetchStep()
+        }
+    },[id,page]) ;
+
+    useEffect(() => {        
+        if(data && paginaEdit){
             const pasos = data.results;
+            // console.log("hay pasos? "+pasos)
             const stepOfRecipe = pasos.filter((step) => step.recipe === parseInt(id));
-            setListStep(stepOfRecipe)
-            setOrden(stepOfRecipe.length + 1)
-    
+            setListStep((prevStep) => [...prevStep, ...stepOfRecipe]);
+            
             if (data.next) {
-                fetchSteps(data.next);
+                setPage((prevPage) => prevPage + 1)
+            }else{
+                setOrden((prevOrden) => prevOrden+(listStep.length + 1));
             }
-        } catch (error) {
-            console.error("Error en la petición:", error);
+        }else{
+
         }
-    };
-    
+    }, [id, paginaEdit,data]);
+
     useEffect(() => {
-        if (paginaEdit) {
-            fetchSteps(`${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`);
+        if (listStep && id) {
+            setListStep(listStep.sort((a, b) => a.order - b.order));
         }
-    }, [id, paginaEdit]);
+    }, [listStep, id]);
 
     function handleClick() {
         setFormPaso(!formPaso);
@@ -49,12 +61,19 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
             [event.target.name]: event.target.value,
         });
     }
+    //para cuando se modifique la lista de los pasos debe de cambiarse el orden en el que va
+    useEffect(()=>{
+        setOrden(listStep.length + 1);
+        setPaso(prevPaso => ({
+            ...prevPaso,
+            order: listStep.length + 1
+          }));
+    },[listStep])
 
     // function para los NUEVOS elementos a cargar o asignar
     function handleSubmitPaso(event) {
-        // event.stopPropagation();
         event.preventDefault();
-        console.log(paso)
+        console.log("add "+paso.order)
         addStep(paso); // llamada desde RecetaForm
         setPasoSubmit([...pasoSubmit, paso]); //array para ir mostrando
         setPaso({ order: orden+1, instruction: "" });
@@ -69,14 +88,21 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
             [event.target.name]: event.target.value,
         });
     }
-    function onClickStepEdit(id, event) {
+    function handleOnClickStepEdit(id, event) {
         // para modicar un paso debo de tener el orden del paso
         const [lista] = listStep.filter((step) => step.order === id);
-        console.log(lista); //paso inicial
-        console.log(stepsEdit); //campo modificado
+        //console.log(lista); //paso inicial
+        //console.log(stepsEdit); //campo modificado
         editStepInitial([lista, stepsEdit]);
     }
-    
+    function handleOnClickDelete(idEliminado){
+        const listaUpdate=listStep.filter(step => step.id !== parseInt(idEliminado))
+        // console.log(listaUpdate)
+        setListStep(listaUpdate)//actualizando lista de ingredientes    
+        // setOrden(listStep.length+1)    
+        deleteStep(idEliminado)//mandamos el id a RecetaForm
+    }
+
     return (
         <div className="container is-flex is-flex-direction-column">
             <div className="is-flex is-flex-direction-row is-justify-content-space-between mb-1">
@@ -95,33 +121,38 @@ export default function Paso({addStep, paginaEdit, editStepInitial,}) {
                         ? listStep.map((step, index) => (
                               <div
                                   key={index}
-                                  className="columns m-1"
+                                  className="is-flex is-flex-direction-row m-1"
                               >                                 
                                   <input
-                                      className="input mr-1 column is-narrow"
+                                      className="input mr-1"
                                       type="number"
                                       name="order"
                                       value={step.order}
                                       style={{width:"5em"}}
                                     //   onChange={handleStepEditChange}
                                     //   required
-                                      readOnly
+                                      
                                   />
                                   <input
-                                      className="input mr-1 column"
+                                      className="input mr-1 "
                                       type="text"
                                       name="instruction"
-                                      value={step.instruction}
-                                    //   defaultValue={step.instruction}
+                                    //   value={step.instruction}
+                                      defaultValue={step.instruction}
                                       onChange={handleStepEditChange}
-                                      required
                                   />
                                   <p
-                                      onClick={() => onClickStepEdit(step.order)}
-                                      className="button is-info"
+                                      onClick={() => handleOnClickStepEdit(step.order)}
+                                      className="button is-info mr-1"
                                   >
-                                      {" "}
                                       <ion-icon name="create-outline"></ion-icon>
+                                  </p>
+                                  <p
+                                      onClick={() => handleOnClickDelete(step.id)}
+                                      className="button is-danger"
+                                  >
+                                      
+                                      <ion-icon name="trash-outline"></ion-icon>
                                   </p>
                               </div>
                           ))
