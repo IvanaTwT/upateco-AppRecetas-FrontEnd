@@ -26,8 +26,10 @@ export default function RecetaDetail() {
     );
 
     useEffect(() => {
-        doFetch();
-    }, []);
+        if(id){
+            doFetch();
+        }
+    }, [id]);
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar las recetas.</p>;

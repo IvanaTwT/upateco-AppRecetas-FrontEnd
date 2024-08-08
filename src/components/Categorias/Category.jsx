@@ -42,7 +42,7 @@ export default function Category({receta, addCategorias, paginaEdit}) {
         const updatedSelectedCategories = categories.filter((cat) =>
             selectedOptions.includes(String(cat.id))
         );
-        console.log("??? c:"+updatedSelectedCategories)//actualizacion de categorias seleccionadas
+        //console.log("??? c:"+updatedSelectedCategories)//actualizacion de categorias seleccionadas
         setSelectedCategories(updatedSelectedCategories);//selecciona las categorias al select
         addCategorias(updatedSelectedCategories)//agrega las categorias
     }

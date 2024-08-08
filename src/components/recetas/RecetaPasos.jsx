@@ -32,7 +32,8 @@ export default function RecetaPasos({ receta }) {
     //ordenar
     useEffect(() => {
         if (pasos && receta.id) {
-            setPasos(pasos.sort((a, b) => a.order - b.order));
+            const pasosOrdenados=pasos.sort((a, b) => a.order - b.order)
+            setPasos(pasosOrdenados);
         }
     }, [pasos, receta.id]);
 

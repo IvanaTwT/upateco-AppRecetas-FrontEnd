@@ -12,7 +12,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
     const [page, setPage]= useState(1);
 
     const [formPaso, setFormPaso] = useState(false);
-
+    const [lista, setLista] = useState([]);//lista inicial
     // ediciones para los ingredientes anteriores
     const [listStep, setListStep] = useState([]);
     const [stepsEdit, setStepsEdit] = useState([]);
@@ -33,23 +33,24 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
             const pasos = data.results;
             // console.log("hay pasos? "+pasos)
             const stepOfRecipe = pasos.filter((step) => step.recipe === parseInt(id));
-            setListStep((prevStep) => [...prevStep, ...stepOfRecipe]);
+            setLista((prevStep) => [...prevStep, ...stepOfRecipe]);
             
             if (data.next) {
                 setPage((prevPage) => prevPage + 1)
             }else{
-                setOrden((prevOrden) => prevOrden+(listStep.length + 1));
+                setOrden((prevOrden) => prevOrden+(lista.length + 1));
             }
-        }else{
-
         }
     }, [id, paginaEdit,data]);
 
     useEffect(() => {
-        if (listStep && id) {
-            setListStep(listStep.sort((a, b) => a.order - b.order));
+        if (lista && id) {
+            setListStep(lista.sort((a, b) => a.order - b.order));
+            // listStep.map((st)=>{
+            //    console.log(st.order+":"+st.instruction)
+            // })
         }
-    }, [listStep, id]);
+    }, [lista, id]);
 
     function handleClick() {
         setFormPaso(!formPaso);
@@ -63,12 +64,12 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
     }
     //para cuando se modifique la lista de los pasos debe de cambiarse el orden en el que va
     useEffect(()=>{
-        setOrden(listStep.length + 1);
+        setOrden(lista.length + 1);
         setPaso(prevPaso => ({
             ...prevPaso,
-            order: listStep.length + 1
+            order: lista.length + 1
           }));
-    },[listStep])
+    },[lista])
 
     // function para los NUEVOS elementos a cargar o asignar
     function handleSubmitPaso(event) {

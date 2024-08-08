@@ -8,7 +8,7 @@ import Paso from "../pasos/Paso";
 
 export default function RecetaForm() {
     const { id } = useParams();
-    const navigate= useNavigate();
+    const navigate = useNavigate();
     const { isAuthenticated, token } = useAuth("state");
 
     const [recipe, setRecipe] = useState({
@@ -21,27 +21,32 @@ export default function RecetaForm() {
 
     const [image, setImage] = useState(null);
     const [formCargado, setFormCargado] = useState(false);
-    const [ingredientes, setIngredientes] = useState([]);//todos los ingredientes de la receta
-    const [steps, setSteps] = useState([]);//todos los pasos de la receta
-    const [categorias, setCategorias] = useState([]);//categorias de la receta
+    const [ingredientes, setIngredientes] = useState([]); //todos los ingredientes de la receta
+    const [steps, setSteps] = useState([]); //todos los pasos de la receta
+    const [categorias, setCategorias] = useState([]); //categorias de la receta
     // booleano para acceder a edit o no
     const [paginaEdit, setPagEdit] = useState(false);
     // lista para ingredientes y pasos a eliminar
-    const [ingredientDelete, setIngDelete]= useState([])
-    const [stepDelete, setStepDelete]= useState([])
+    const [ingredientDelete, setIngDelete] = useState([]);
+    const [stepDelete, setStepDelete] = useState([]);
     //elementos array con array[0] inicial y array[1] campo/s modificado
-    const [ingInitial, setIngInitial] = useState([]);    
+    const [ingInitial, setIngInitial] = useState([]);
     const [stepInitial, setStepInitial] = useState([]);
+    
     const [{ data, isError, isLoading }, doFetch] = useFetch(
         `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
         {}
     );
-
+    //paginacion para ingredientes y categories (TI)
+    const [page,setPage]=useState(1)
+    const [allIng, setAllIng]=useState([])
+    const [pageCat, setPageCat]=useState(1)
+    const [recipeCat, setRecipeCat]=useState([])
 
     useEffect(() => {
         doFetch();
     }, []);
-    
+
     const [
         { data: dataPost, isError: isErrorPost, isLoading: isLoadingPost },
         doFetchPost,
@@ -59,17 +64,12 @@ export default function RecetaForm() {
         },
         doFetchIngredient,
     ] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/?page=${page}`,
         {}
     );
-    
 
     const [
-        {
-            data: dataPut,
-            isError: isErrorPut,
-            isLoading: isLoadingPut,
-        },
+        { data: dataPut, isError: isErrorPut, isLoading: isLoadingPut },
         doFetchPut,
     ] = useFetch(
         `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipes/${id}`,
@@ -80,9 +80,20 @@ export default function RecetaForm() {
             },
         }
     );
+    //traer las categorias relacionada a esta receta
+    const [
+        {
+            data: dataRecipeCategory,
+            isError: isErrorRecipeCategory,
+            isLoading: isLoadingRecipeCategory,
+        },
+        doFetchRecipeCategory,
+    ] = useFetch(
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-categories/?page=${pageCat}`,
+        {}
+    );
 
     useEffect(() => {
-        doFetchIngredient();
         if (data && window.location.pathname !== "/recetas/new") {
             setRecipe({
                 title: data.title || "",
@@ -97,8 +108,40 @@ export default function RecetaForm() {
         }
     }, [data]);
 
+    //traer todos los ingredientes
+    useEffect(()=>{
+        doFetchIngredient();
+    },[page])
+
+    useEffect(() => {        
+        if(id && dataIngredient){
+            const list=dataIngredient.results
+            setAllIng((prevLista) => [...prevLista, ...list]);
+            
+            if (dataIngredient.next) {
+                setPage((prevPage) => prevPage + 1)
+            }
+        }
+    }, [id]);
+    //traer las categorias relacionadas a esta receta
+    useEffect(()=>{
+        doFetchRecipeCategory();
+    },[pageCat])
+
+    useEffect(() => {        
+        if(id && dataRecipeCategory){
+            const list=dataRecipeCategory.results.filter((rc) => rc.recipe === parseInt(id));
+            console.log("??"+list)
+            setRecipeCat((prevLista) => [...prevLista, ...list]);
+            
+            if (dataRecipeCategory.next) {
+                setPageCat((prevPage) => prevPage + 1)
+            }
+        }
+    }, [id]);
+
     useEffect(() => {
-        if (formCargado) {
+        if (formCargado && allIng && recipeCat) {
             const newForm = new FormData();
             newForm.append("title", recipe.title);
             newForm.append("description", recipe.description);
@@ -106,35 +149,41 @@ export default function RecetaForm() {
             newForm.append("cooking_time", recipe.cooking_time);
             newForm.append("servings", recipe.servings);
             console.log("ingredientes (RF): " + ingredientes); //lista de objetos, preguntar si tiene length(tamaño)
-            if (image && image!== data.image) {
+            if (image && image !== data.image) {
                 newForm.append("image", image);
             }
             if (window.location.pathname === "/recetas/new") {
-                console.log("peticion post");                
+                console.log("peticion post");
                 doFetchPost({ body: newForm });
-            } else {                
+            } else {
                 console.log("peticion put-patch");
-                console.log("-"+newForm)
+                console.log("-" + newForm);
                 doFetchPut({ body: newForm });
             }
             setFormCargado(false);
         }
-    }, [formCargado, recipe, image, ingredientes, categorias]);
+    }, [formCargado, recipe, image, ingredientes, categorias, allIng, recipeCat]);
 
     useEffect(() => {
-        if (!isErrorPut && formCargado && paginaEdit) {
+        if (!isErrorPut && formCargado && paginaEdit && allIng && recipeCat) {
+            console.log("Size all ing: "+allIng.length) //obtener el ultimo cambio de las categorias select
+            // console.log("Cate:"+categorias)
             //array=[ [ {},{} ] , [ {},{} ] ]
-            if(ingredientes.length>0){
+            if (ingredientes.length > 0) {
                 //ingredientes agregados
                 ingredientes.forEach((ingredient) => {
+                    
                     // Buscar ingrediente en la base de datos antes de crearlo
-                    const existingIngredient = dataIngredient.results.find(
+                    const existingIngredient = allIng.find(
                         (item) => item.name.toLowerCase() === ingredient.name.toLowerCase()
-                    );//devuelve el ingrediente encontrado, {id, name, description, ..}
+                    ); //devuelve el ingrediente encontrado, {id, name, description, ..}
+                    console.log("Exist== "+existingIngredient)
                     if (existingIngredient) {
                         //asociar ingrediente a la receta
                         fetch(
-                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/`,
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/reciperover/recipe-ingredients/`,
                             {
                                 method: "POST",
                                 headers: {
@@ -144,24 +193,33 @@ export default function RecetaForm() {
                                 body: JSON.stringify({
                                     quantity: ingredient.quantity,
                                     measure: ingredient.measure,
-                                    recipe: parseInt(id),
+                                    recipe: id,
                                     ingredient: existingIngredient.id,
                                 }),
                             }
                         )
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.id) {
-                                console.error("Error al asociar el ingrediente existente:", data);
-                            } else {
-                                console.log("Ingrediente existente asociado:");
-                            }
-                        })
-                        .catch(error => console.error("Error en la petición:", error));
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (!data.id) {
+                                    console.error(
+                                        "Error al asociar el ingrediente existente:",
+                                        data
+                                    );
+                                } else {
+                                    console.log(
+                                        "Ingrediente existente asociado:"
+                                    );
+                                }
+                            })
+                            .catch((error) =>
+                                console.error("Error en la petición:", error)
+                            );
                     } else {
                         // Si el ingrediente no existe, crearlo y luego asociarlo a la receta
                         fetch(
-                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/`,
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/reciperover/ingredients/`,
                             {
                                 method: "POST",
                                 headers: {
@@ -173,90 +231,84 @@ export default function RecetaForm() {
                                 }),
                             }
                         )
-                        .then(response => response.json())
-                        .then(newIngrediente => {
-                            if (newIngrediente.id) {
-                                fetch(
-                                    `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/`,
-                                    {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            Authorization: `Token ${token}`,
-                                        },
-                                        body: JSON.stringify({
-                                            quantity: ingredient.quantity,
-                                            measure: ingredient.measure,
-                                            recipe: parseInt(id),
-                                            ingredient: newIngrediente.id,
-                                        }),
-                                    }
-                                )
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (!data.id) {
-                                        console.error("Error al asociar el nuevo ingrediente:", data);
-                                    } else {
-                                        console.log("Nuevo ingrediente asociado:");
-                                    }
-                                })
-                                .catch(error => console.error("Error en la petición:", error));
-                            } else {
-                                console.error("Error al crear el ingrediente:", data);
-                            }
-                        })
-                        .catch(error => console.error("Error en la petición:", error));
-                    }
-                });
-                
-            }
-            //editar el ingrediente guardado por el actualizado
-            if(ingInitial.length>0){
-                ingInitial.map(subArray => {
-                    // subArray.map(objeto => {
-                        let actual=subArray[0];//tiene {id: 30, ingredient: 33, name: 'Coco', quantity: 200, measure: 'g'}
-                        const update=subArray[1];//recorrer para cambiar el valor
-                        if("name" in update){//verificar que name no este cambiado
-                            Object.entries(update).map(([clave, valor]) => {
-                                console.log(`${clave}: ${valor}`);//quantity: 120
-                                actual[clave]=valor
-                            });
-                            fetch(
-                                `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/${actual.id}`,
-                                {
-                                    method: "PUT",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Token ${token}`,
-                                    },
-                                    body: JSON.stringify({
-                                        
-                                        quantity: actual.quantity,
-                                        measure: actual.measure,
-                                        recipe: parseInt(id),
-                                        ingredient: actual.ingredient,
-                                    }),
-                                }
-                            )
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.id) {
-                                    console.error("Error al asociar el ingrediente editado:", data);
+                            .then((response) => response.json())
+                            .then((newIngrediente) => {
+                                if (newIngrediente.id) {
+                                    fetch(
+                                        `${
+                                            import.meta.env.VITE_API_BASE_URL
+                                        }/reciperover/recipe-ingredients/`,
+                                        {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                                Authorization: `Token ${token}`,
+                                            },
+                                            body: JSON.stringify({
+                                                quantity: ingredient.quantity,
+                                                measure: ingredient.measure,
+                                                recipe: parseInt(id),
+                                                ingredient: newIngrediente.id,
+                                            }),
+                                        }
+                                    )
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                            if (!data.id) {
+                                                console.error(
+                                                    "Error al asociar el nuevo ingrediente:",
+                                                    data
+                                                );
+                                            } else {
+                                                console.log(
+                                                    "Nuevo ingrediente asociado:"
+                                                );
+                                            }
+                                        })
+                                        .catch((error) =>
+                                            console.error(
+                                                "Error en la petición:",
+                                                error
+                                            )
+                                        );
                                 } else {
-                                    console.log("Ingrediente asociado:");
+                                    console.error(
+                                        "Error al crear al asociar el nuevo ingrediente:",
+                                        ingredient
+                                    );
                                 }
                             })
-                            .catch(error => console.error("Error en la petición:", error));
-                        }else{
+                            .catch((error) =>
+                                console.error("Error en la petición:", error)
+                            );
+                    }
+                });
+            }
+            //editar el ingrediente guardado por el actualizado
+            if (ingInitial.length > 0) {
+                ingInitial.map((subArray) => {
+                    // subArray.map(objeto => {
+                    const actual = subArray[0]; //tiene {id: 30, ingredient: 33, name: 'Coco', quantity: 200, measure: 'g'}
+                    const update = subArray[1]; //recorrer para cambiar el valor
+                    if ("name" in update) {
+                        //verificar que name tenga algo
+                        if (update.name) {
                             //si el nombre se cambia hay que verificar que no exista para crearlo y referenciarlo
                             //caso contrario solo referenciar
-                            const existingIngredient = dataIngredient.results.find(
-                                (item) => item.name.toLowerCase() === update.name.toLowerCase()
-                            );//devuelve el ingrediente encontrado, {id, name, description, ..}
+                            const existingIngredient =
+                                allIng.find(
+                                    (item) =>
+                                        item.name.toLowerCase() ===
+                                        update.name.toLowerCase()
+                                ); //devuelve el ingrediente encontrado, {id, name, description, ..}
+                            console.log("Existe ing?:"+existingIngredient.id)
                             if (existingIngredient) {
                                 //asociar ingrediente a la receta
                                 fetch(
-                                    `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/`,
+                                    `${
+                                        import.meta.env.VITE_API_BASE_URL
+                                    }/reciperover/recipe-ingredients/`,
                                     {
                                         method: "POST",
                                         headers: {
@@ -271,19 +323,31 @@ export default function RecetaForm() {
                                         }),
                                     }
                                 )
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (!data.id) {
-                                        console.error("Error al asociar el ingrediente existente:", data);
-                                    } else {
-                                        console.log("Ingrediente existente asociado:");
-                                    }
-                                })
-                                .catch(error => console.error("Error en la petición:", error));
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                        if (!data.id) {
+                                            console.error(
+                                                "Error al asociar el ingrediente existente:",
+                                                data
+                                            );
+                                        } else {
+                                            console.log(
+                                                "Ingrediente existente asociado:"
+                                            );
+                                        }
+                                    })
+                                    .catch((error) =>
+                                        console.error(
+                                            "Error en la petición:",
+                                            error
+                                        )
+                                    );
                             } else {
                                 // Si el ingrediente no existe, crearlo y luego asociarlo a la receta
                                 fetch(
-                                    `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/`,
+                                    `${
+                                        import.meta.env.VITE_API_BASE_URL
+                                    }/reciperover/ingredients/`,
                                     {
                                         method: "POST",
                                         headers: {
@@ -295,104 +359,76 @@ export default function RecetaForm() {
                                         }),
                                     }
                                 )
-                                .then(response => response.json())
-                                .then(newIngrediente => {
-                                    if (newIngrediente.id) {
-                                        fetch(
-                                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/`,
-                                            {
-                                                method: "POST",
-                                                headers: {
-                                                    "Content-Type": "application/json",
-                                                    Authorization: `Token ${token}`,
-                                                },
-                                                body: JSON.stringify({
-                                                    quantity: actual.quantity,
-                                                    measure: actual.measure,
-                                                    recipe: parseInt(id),
-                                                    ingredient: newIngrediente.id,
-                                                }),
-                                            }
+                                    .then((response) => response.json())
+                                    .then((newIngrediente) => {
+                                        if (newIngrediente.id) {
+                                            fetch(
+                                                `${
+                                                    import.meta.env
+                                                        .VITE_API_BASE_URL
+                                                }/reciperover/recipe-ingredients/`,
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type":
+                                                            "application/json",
+                                                        Authorization: `Token ${token}`,
+                                                    },
+                                                    body: JSON.stringify({
+                                                        quantity:
+                                                            actual.quantity,
+                                                        measure: actual.measure,
+                                                        recipe: parseInt(id),
+                                                        ingredient:
+                                                            newIngrediente.id,
+                                                    }),
+                                                }
+                                            )
+                                                .then((response) =>
+                                                    response.json()
+                                                )
+                                                .then((data) => {
+                                                    if (!data.id) {
+                                                        console.error(
+                                                            "Error al asociar el nuevo ingrediente:",
+                                                            data
+                                                        );
+                                                    } else {
+                                                        console.log(
+                                                            "Nuevo ingrediente asociado:"
+                                                        );
+                                                    }
+                                                })
+                                                .catch((error) =>
+                                                    console.error(
+                                                        "Error en la petición:",
+                                                        error
+                                                    )
+                                                );
+                                        } else {
+                                            console.error(
+                                                "Error al crear el ingrediente:",
+                                                data
+                                            );
+                                        }
+                                    })
+                                    .catch((error) =>
+                                        console.error(
+                                            "Error en la petición:",
+                                            error
                                         )
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (!data.id) {
-                                                console.error("Error al asociar el nuevo ingrediente:", data);
-                                            } else {
-                                                console.log("Nuevo ingrediente asociado:");
-                                            }
-                                        })
-                                        .catch(error => console.error("Error en la petición:", error));
-                                    } else {
-                                        console.error("Error al crear el ingrediente:", data);
-                                    }
-                                })
-                                .catch(error => console.error("Error en la petición:", error));
+                                    );
                             }
                         }
-                });
-            }
-            //eliminar ingrediente
-            if(ingredientDelete.length>0){
-                ingredientDelete.map(id=>{
-                    fetch(
-                        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/${id}`,
-                        {
-                            method: "DELETE",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Token ${token}`,
-                            },
-                        }
-                    )
-                    .then(response => {
-                        if (!response.ok) {
-                          throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        console.log("Ingrediente Eliminado....");
-                      })
-                    .catch(error => console.error("Error en la petición:", error));
-                })
-            }
-            //pasos agregados
-            if(steps.length>0){
-                steps.map(paso =>{
-                        console.log(paso)//{order: int, instruction: string}
+                    } else {
+                        Object.entries(update).map(([clave, valor]) => {
+                            //console.log(`${clave}: ${valor}`); //quantity: 120
+                            actual[clave] = valor;
+                        });
                         fetch(
-                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`,
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Token ${token}`,
-                                },
-                                body: JSON.stringify({
-                                    order:paso.order,
-                                    instruction:paso.instruction,
-                                    recipe:id
-                                }),
-                            }
-                        )
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.id) {
-                                console.error("Error al crear paso existente:", data);
-                            } else {
-                                console.log("Paso creado asociado:");
-                            }
-                        })
-                        .catch(error => console.error("Error en la petición:", error));
-                })
-            }
-            //pasos editados
-            if(stepInitial.length>0){
-                stepInitial.map(subArray => {
-                    // subArray.map(objeto => {
-                        let actual=subArray[0];//tiene {order: int , instruction : string}
-                        const update=subArray[1];//recorrer para cambiar el valor
-                        
-                        fetch(
-                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/${id}`,
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/reciperover/recipe-ingredients/${actual.id}/`,
                             {
                                 method: "PUT",
                                 headers: {
@@ -400,29 +436,37 @@ export default function RecetaForm() {
                                     Authorization: `Token ${token}`,
                                 },
                                 body: JSON.stringify({
-                                    recipe:id,
-                                    order: actual.order,
-                                    instruction: update.instruction
+                                    quantity: actual.quantity,
+                                    measure: actual.measure,
+                                    recipe: parseInt(id),
+                                    ingredient: actual.ingredient,
                                 }),
                             }
-                            )
-                            .then(response => response.json())
-                            .then(data => {
+                        )
+                            .then((response) => response.json())
+                            .then((data) => {
                                 if (!data.id) {
-                                    console.error("Error al editar preparacion:", data);
+                                    console.error(
+                                        "Error al asociar el ingrediente editado:",
+                                        data
+                                    );
                                 } else {
-                                    console.log("Preparacion editada!");
+                                    console.log("Ingrediente asociado:");
                                 }
                             })
-                            .catch(error => console.error("Error en la petición:", error));
-                        
-                    })
+                            .catch((error) =>
+                                console.error("Error en la petición:", error)
+                            );
+                    }
+                });
             }
-            //pasos eliminados
-            if(stepDelete.length>0){
-                stepDelete.map(id=>{
+            //eliminar ingrediente
+            if (ingredientDelete.length > 0) {
+                ingredientDelete.map((id) => {
                     fetch(
-                        `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/${id}`,
+                        `${
+                            import.meta.env.VITE_API_BASE_URL
+                        }/reciperover/recipe-ingredients/${id}`,
                         {
                             method: "DELETE",
                             headers: {
@@ -431,35 +475,217 @@ export default function RecetaForm() {
                             },
                         }
                     )
-                    .then(response => {
-                        if (!response.ok) {
-                          throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        console.log("Paso Eliminado");
-                      })
-                    .catch(error => console.error("Error en la petición:", error));
-                })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(
+                                    `HTTP error! Status: ${response.status}`
+                                );
+                            }
+                            console.log("Ingrediente Eliminado....");
+                        })
+                        .catch((error) =>
+                            console.error("Error en la petición:", error)
+                        );
+                });
             }
-            navigate(`/recetas/${id}`);
+            //pasos agregados
+            if (steps.length > 0) {
+                steps.map((paso) => {
+                    console.log(paso); //{order: int, instruction: string}
+                    fetch(
+                        `${
+                            import.meta.env.VITE_API_BASE_URL
+                        }/reciperover/steps/`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify({
+                                order: paso.order,
+                                instruction: paso.instruction,
+                                recipe: id,
+                            }),
+                        }
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (!data.id) {
+                                console.error(
+                                    "Error al crear paso existente:",
+                                    data
+                                );
+                            } else {
+                                console.log("Paso creado asociado:");
+                            }
+                        })
+                        .catch((error) =>
+                            console.error("Error en la petición:", error)
+                        );
+                });
+            }
+            //pasos editados
+            if (stepInitial.length > 0) {
+                stepInitial.map((subArray) => {
+                    // subArray.map(objeto => {
+                    const actual = subArray[0]; //tiene {order: int , instruction : string}
+                    const update = subArray[1]; //recorrer para cambiar el valor
+                    console.log(actual)
+                    console.log(update)
+                    fetch(
+                        `${
+                            import.meta.env.VITE_API_BASE_URL
+                        }/reciperover/steps/${actual.id}/`,
+                        {
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify({
+                                recipe: id,
+                                order: actual.order,
+                                instruction: update.instruction,
+                            }),
+                        }
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (!data.id) {
+                                console.error(
+                                    "Error al editar preparacion:",
+                                    data
+                                );
+                            } else {
+                                console.log("Preparacion editada!");
+                            }
+                        })
+                        .catch((error) =>
+                            console.error("Error en la petición:", error)
+                        );
+                });
+            }
+            //pasos eliminados
+            if (stepDelete.length > 0) {
+                stepDelete.map((id) => {
+                    fetch(
+                        `${
+                            import.meta.env.VITE_API_BASE_URL
+                        }/reciperover/steps/${id}/`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                Authorization: `Token ${token}`,
+                            },
+                        }
+                    )
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(
+                                    `HTTP error! Status: ${response.status}`
+                                );
+                            }
+                            console.log("Paso Eliminado");
+                        })
+                        .catch((error) =>
+                            console.error("Error en la petición:", error)
+                        );
+                });
+            }
+            //cargar categorias
+            const listCate = categorias[categorias.length - 1];
+            console.log("lc"+listCate)
+            let tipoList=String(typeof listCate) 
+            console.log(tipoList)
+            //si es lista, deberemos de cambiar la categoria/s, de lo contrario el usu no actualizo apartado categories
+            if (categorias.length > 0 && (tipoList==='object' )) {
+                 //trae el ultimo par de objetos en una lista
+                //si el usuario no hizo nuevamenete una seleccion,solo tiene numeros porque es la inicial, ids
+                listCate.forEach((category) => {
+                    // console.log(category) // object
+                    fetch(
+                        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-categories/`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Token ${token}`,
+                            },
+                            body: JSON.stringify({
+                                recipe: id,
+                                category: category.id,
+                            }),
+                        }
+                    ).then(response => response.json())
+                    .then(data => {
+                        if (!data.id) {
+                            console.error("Error en la creación de la categoría:", data);
+                        }
+                    }).catch(error => console.error("Error en la petición:", error));
+                });
+            }else{
+                //eliminamos las categorias que existen
+                console.log("Size (RC): "+recipeCat.length)
+                if(recipeCat){
+                    recipeCat.map((rp) => {
+                        fetch(
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/reciperover/recipe-categories/${rp.id}/`,
+                            {
+                                method: "DELETE",
+                                headers: {
+                                    Authorization: `Token ${token}`,
+                                },
+                            }
+                        )
+                            .then((response) => {
+                                if (!response.ok) {
+                                    throw new Error(
+                                        `HTTP error! Status: ${response.status}`
+                                    );
+                                }
+                                console.log("Categoria Eliminada");
+                            })
+                            .catch((error) =>
+                                console.error("Error en la petición:", error)
+                            );
+                    })
+                }
+            }
+            return navigate(`/recetas/${id}`);
         }
-    }, [formCargado,paginaEdit,dataPut,ingredientes,ingInitial, steps ])
-    
+    }, [
+        formCargado,
+        paginaEdit,
+        dataPut,
+        ingredientes,
+        ingInitial,
+        steps,
+        categorias
+    ]);
+
     useEffect(() => {
         if (dataPost) {
             console.log("Nueva receta creada con ID:", dataPost.id); // ID de la NUEVA RECETA
             setCategorias(categorias[categorias.length - 1]); //el ultimo cambio de categoria
-            console.log("Categorias reset: "+categorias)            
+            console.log("Categorias reset: " + categorias);
             if (ingredientes.length > 0) {
                 ingredientes.forEach((ingredient) => {
                     // Buscar ingrediente en la base de datos antes de crearlo
-                    const existingIngredient = dataIngredient.results.find(
-                        (item) => item.name.toLowerCase() === ingredient.name.toLowerCase()
+                    const existingIngredient = allIng.find(
+                        (item) =>
+                            item.name.toLowerCase() ===
+                            ingredient.name.toLowerCase()
                     );
                     // console.log("Existe? "+existingIngredient);
                     if (existingIngredient) {
                         // Si el ingrediente existe, asociarlo a la receta
                         fetch(
-                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/`,
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/reciperover/recipe-ingredients/`,
                             {
                                 method: "POST",
                                 headers: {
@@ -474,19 +700,29 @@ export default function RecetaForm() {
                                 }),
                             }
                         )
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.id) {
-                                console.error("Error al asociar el ingrediente existente:", data);
-                            } else {
-                                console.log("Ingrediente existente asociado:", data);
-                            }
-                        })
-                        .catch(error => console.error("Error en la petición:", error));
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (!data.id) {
+                                    console.error(
+                                        "Error al asociar el ingrediente existente:",
+                                        data
+                                    );
+                                } else {
+                                    console.log(
+                                        "Ingrediente existente asociado:",
+                                        data
+                                    );
+                                }
+                            })
+                            .catch((error) =>
+                                console.error("Error en la petición:", error)
+                            );
                     } else {
                         // Si el ingrediente no existe, crearlo y luego asociarlo a la receta
                         fetch(
-                            `${import.meta.env.VITE_API_BASE_URL}/reciperover/ingredients/`,
+                            `${
+                                import.meta.env.VITE_API_BASE_URL
+                            }/reciperover/ingredients/`,
                             {
                                 method: "POST",
                                 headers: {
@@ -498,46 +734,67 @@ export default function RecetaForm() {
                                 }),
                             }
                         )
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.id) {
-                                fetch(
-                                    `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-ingredients/`,
-                                    {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            Authorization: `Token ${token}`,
-                                        },
-                                        body: JSON.stringify({
-                                            quantity: ingredient.quantity,
-                                            measure: ingredient.measure,
-                                            recipe: dataPost.id,
-                                            ingredient: data.id,
-                                        }),
-                                    }
-                                )
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (!data.id) {
-                                        console.error("Error al asociar el nuevo ingrediente:", data);
-                                    } else {
-                                        console.log("Nuevo ingrediente asociado:", data);
-                                    }
-                                })
-                                .catch(error => console.error("Error en la petición:", error));
-                            } else {
-                                console.error("Error al crear el ingrediente:", data);
-                            }
-                        })
-                        .catch(error => console.error("Error en la petición:", error));
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (data.id) {
+                                    fetch(
+                                        `${
+                                            import.meta.env.VITE_API_BASE_URL
+                                        }/reciperover/recipe-ingredients/`,
+                                        {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                                Authorization: `Token ${token}`,
+                                            },
+                                            body: JSON.stringify({
+                                                quantity: ingredient.quantity,
+                                                measure: ingredient.measure,
+                                                recipe: dataPost.id,
+                                                ingredient: data.id,
+                                            }),
+                                        }
+                                    )
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                            if (!data.id) {
+                                                console.error(
+                                                    "Error al asociar el nuevo ingrediente:",
+                                                    data
+                                                );
+                                            } else {
+                                                console.log(
+                                                    "Nuevo ingrediente asociado:",
+                                                    data
+                                                );
+                                            }
+                                        })
+                                        .catch((error) =>
+                                            console.error(
+                                                "Error en la petición:",
+                                                error
+                                            )
+                                        );
+                                } else {
+                                    console.error(
+                                        "Error al crear el ingrediente:",
+                                        data
+                                    );
+                                }
+                            })
+                            .catch((error) =>
+                                console.error("Error en la petición:", error)
+                            );
                     }
                 });
             }
-            if(steps.length > 0){
+            if (steps.length > 0) {
                 steps.forEach((paso) => {
                     fetch(
-                        `${import.meta.env.VITE_API_BASE_URL}/reciperover/steps/`,
+                        `${
+                            import.meta.env.VITE_API_BASE_URL
+                        }/reciperover/steps/`,
                         {
                             method: "POST",
                             headers: {
@@ -547,21 +804,30 @@ export default function RecetaForm() {
                             body: JSON.stringify({
                                 recipe: dataPost.id,
                                 order: paso.order,
-                                instruction: paso.instruction
+                                instruction: paso.instruction,
                             }),
                         }
-                    ).then(response => response.json())
-                    .then(data => {
-                        if (!data.id) {
-                            console.error("Error en la creación de la step:", data);
-                        }
-                    }).catch(error => console.error("Error en la petición step:", error));
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (!data.id) {
+                                console.error(
+                                    "Error en la creación de la step:",
+                                    data
+                                );
+                            }
+                        })
+                        .catch((error) =>
+                            console.error("Error en la petición step:", error)
+                        );
                 });
             }
-            if (categorias.length > 0) {
+            if (categorias.length > 0 && categorias.length > 2) {
                 categorias.forEach((category) => {
                     fetch(
-                        `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-categories/`,
+                        `${
+                            import.meta.env.VITE_API_BASE_URL
+                        }/reciperover/recipe-categories/`,
                         {
                             method: "POST",
                             headers: {
@@ -573,59 +839,65 @@ export default function RecetaForm() {
                                 category: category.id,
                             }),
                         }
-                    ).then(response => response.json())
-                    .then(data => {
-                        if (!data.id) {
-                            console.error("Error en la creación de la categoría:", data);
-                        }
-                    }).catch(error => console.error("Error en la petición:", error));
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (!data.id) {
+                                console.error(
+                                    "Error en la creación de la categoría:",
+                                    data
+                                );
+                            }
+                        })
+                        .catch((error) =>
+                            console.error("Error en la petición:", error)
+                        );
                 });
             }
         }
-    }, [dataPost]);
-    
+    }, [dataPost, allIng]);
+
     // INGREDIENTE - funcion para agregar ingrediente cada vez
     function addIngrediente(ingrediente) {
         // console.log(ingrediente)//{name: string, measure: string, quantity: int}
         setIngredientes([...ingredientes, ingrediente]);
     }
-    
+
     // funcion para editar ingrediente, dentro de lista anidada tendra el objeto inical(ingrediente), y el otro sera el/los campo a modificar
     // [ [ {} , {} ] , [ {}, {} ] .....]   de la primera tomaremos el id y el nombre para poder realizar los cambios
-    function editIngredientInitial(listIngsEdit) {;
-        setIngInitial((prevInicial)=> [...ingInitial, listIngsEdit]);
+    function editIngredientInitial(listIngsEdit) {
+        setIngInitial((prevInicial) => [...ingInitial, listIngsEdit]);
         // console.log(ingInitial);
     }
-    function deleteIngredients(idEliminado){//id para eliminarlo de la receta
+    function deleteIngredients(idEliminado) {
+        //id para eliminarlo de la receta
         // console.log("Eliminando ingrediente id: "+idEliminado)
-        setIngDelete([...ingredientDelete, idEliminado])
+        setIngDelete([...ingredientDelete, idEliminado]);
     }
     // funcion para eliminar ingrediente
     function addCategorias(categoria) {
         setCategorias([...categorias, categoria]);
-        
     }
-    function editCategories(){
-        setCategorias(categorias[categorias.length - 1]); //el ultimo cambio de categoria        
-        return categorias
+    function editCategories() {
+        setCategorias(categorias[categorias.length - 1]); //el ultimo cambio de categoria
+        return categorias;
     }
 
     // PASO - funcion para agregar paso cada vez
     function addStep(step) {
-        setSteps((prevStep) => [...prevStep, step]);     
+        setSteps((prevStep) => [...prevStep, step]);
     }
     // funcion para editar ingrediente, dentro de lista anidada tendra el objeto inical(ingrediente), y el otro sera el/los campo a modificar
     // [ [ {} , {} ] , [ {}, {} ] .....]   de la primera tomaremos el id y el nombre para poder realizar los cambios
     function editStepInitial(listStepsEdit) {
         //(prevInicial)=> [...ingInitial, listIngsEdit]
-        setStepInitial((prevStep)=> [...prevStep, listStepsEdit]);
+        setStepInitial((prevStep) => [...prevStep, listStepsEdit]);
         console.log(ingInitial);
     }
-    function deleteStep(idEliminado){
-        console.log("step elimninado (RF) : "+idEliminado)
-        setStepDelete((prevStep) => [...prevStep, idEliminado])
+    function deleteStep(idEliminado) {
+        console.log("step elimninado (RF) : " + idEliminado);
+        setStepDelete((prevStep) => [...prevStep, idEliminado]);
     }
-    
 
     if (isLoading) return <p>Cargando...</p>;
     if (isError) return <p>Error al cargar las recetas.</p>;
@@ -780,20 +1052,19 @@ export default function RecetaForm() {
                         addIngrediente={addIngrediente}
                         editIngredientInitial={editIngredientInitial}
                         paginaEdit={paginaEdit}
-                        deleteIngredients={deleteIngredients}//lista de id de ingrediente
+                        deleteIngredients={deleteIngredients} //lista de id de ingrediente
                     ></Ingrediente>
                 </div>
-                
+
                 <div className="pasos">
                     <Paso
                         addStep={addStep}
                         editStepInitial={editStepInitial}
                         paginaEdit={paginaEdit}
                         deleteStep={deleteStep}
-                        >
-                    </Paso>
+                    ></Paso>
                 </div>
-               
+
                 <div className="categories">
                     <Category
                         receta={data}
@@ -812,7 +1083,7 @@ export default function RecetaForm() {
                         </button>
                     </div>
                 </div>
-            </form>       
+            </form>
         </section>
     );
 }
