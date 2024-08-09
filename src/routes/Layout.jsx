@@ -7,9 +7,7 @@ export default function Layout() {
     return (
         <AuthProvider>
             <Navbar />
-            <div className="container ">
                 <Outlet />
-            </div>
             <Footer />
         </AuthProvider>
     );

@@ -8,7 +8,8 @@ export default function RecetaCategoria() {
     // const { isAuthenticated, token } = useAuth("state");
     const { id } = useParams();//id de receta
     const [categories, setCategories] = useState([]);
-
+    const [listCategories, setListCategories] = useState([]);
+    const [cont, setCont]=useState(1);
     const [
         {
             data: dataCategories,
@@ -17,7 +18,7 @@ export default function RecetaCategoria() {
         },
         doFetchCategories,
     ] = useFetch(
-        `${import.meta.env.VITE_API_BASE_URL}/reciperover/categories/`,
+        `${import.meta.env.VITE_API_BASE_URL}/reciperover/categories/?page=${cont}`,
         {}
     );
 
@@ -27,16 +28,27 @@ export default function RecetaCategoria() {
 
     useEffect(() => {
         doFetchCategories();
-    }, []);
+    }, [cont]);
 
     useEffect(() => {
         if (dataCategories) {
+          const rta = dataCategories.results;
+          setListCategories((prevCategory) => [...prevCategory, ...rta]);
+    
+          if (dataCategories.next) {
+            setCont((cont) => cont + 1);
+          }
+        }
+      }, [dataCategories]);
+
+    useEffect(() => {
+        if (listCategories) {
             fetch(recipeCategoriesUrl)
                 .then((response) => response.json())
                 .then((recipeCategories) => {
                     // console.log("Recipe Categories: ", recipeCategories.results); //lista
                     const listCat = [];
-                    dataCategories.results.forEach((category) => {
+                    listCategories.forEach((category) => {
                         const [cat] = recipeCategories.results.filter(
                             (rp) => category.id === rp.category
                         ); //devuelve lista
@@ -59,7 +71,7 @@ export default function RecetaCategoria() {
         //     .then((data) => setCategories(data))
         //     .catch((error) => console.error('Error fetching categories:', error));
         // console.log("Data Categories: ", dataCategories.results);
-    }, [dataCategories, id]);
+    }, [listCategories, id]);
 
     return (
         <div className="column">

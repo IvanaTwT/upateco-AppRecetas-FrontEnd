@@ -28,9 +28,12 @@ export default function Navbar() {
     return (
         <header>
             <nav
-                className="navbar is-fixed-top has-shadow custom"
+                className="navbar is-fixed-top has-shadow"
                 role="navigation"
                 aria-label="main navigation"
+                style={{background:"#d66d75", 
+                background: "-webkit-linear-gradient(to right, #d66d75, #e29587)",
+                background: "linear-gradient(to right, #d66d75, #e29587)"}}
             >
                 <div className="navbar-brand">
                     <a className="navbar-item" href="/">

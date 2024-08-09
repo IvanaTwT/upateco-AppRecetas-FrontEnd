@@ -18,3 +18,24 @@
     border: 1px solid #248b21; /* Borde alrededor de cada ítem */
     border-radius: 4px;
 }
+
+/* recetas categories */
+
+
+
+.category-item {
+    border: 1px solid #000; /* Borde gris claro */
+    padding: 10px 20px; /* Espaciado interno */
+    text-align: center; /* Centrando el texto */
+    font-size: 1rem; /* Tamaño de fuente */
+    cursor: pointer; /* Cambiar cursor para indicar que es clickeable */
+    min-width: 150px; /* Ancho mínimo para los elementos */
+    max-width: 200px; /* Ancho máximo para los elementos */
+}
+
+.category-item:hover {
+    background-color: #e0e0e0; /* Color de fondo al pasar el mouse */
+    transform: scale(1.05); /* Aumentar ligeramente el tamaño al pasar el mouse */
+}
+
+
