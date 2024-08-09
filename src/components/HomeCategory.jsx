@@ -42,7 +42,8 @@ export default function HomeCategory() {
                         <div className="">
                             <figure className="image is-128x128">
                                 <img
-                                    className="is-rounded"
+                                    // className="is-rounded"
+                                    style={{borderRadius:"50%"}}
                                     src={`src/assets/img/${cat.name.toLowerCase()}.jpg`}
                                     alt="Rounded image"
                                 />
