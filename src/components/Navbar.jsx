@@ -103,7 +103,7 @@ export default function Navbar() {
                             <div className="navbar-dropdown is-right">
                             {isAuthenticated ? (
                                 <div className="navbar-item">
-                                    <NavLink className="navbar-link " to={`../profile/${user__id}`} relative="path" onClick={closeNavbar}>
+                                    <NavLink className="navbar-link " to={`../profile/`} relative="path" onClick={closeNavbar}>
                                         Mi Perfil
                                     </NavLink>
                                 </div>

@@ -9,6 +9,7 @@ import Profile from "../components/recetas/Profile";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "../components/Auth/Login";
 import RecetasMias from "../components/recetas/RecetasMias"
+import Users from "../components/recetas/Users";
 
 const Router = createBrowserRouter([
     {
@@ -34,10 +35,18 @@ const Router = createBrowserRouter([
                 element: <Login />,
             },
             {
-                path: "/profile/:id",
+                path: "/profile",
                 element: (
                     <ProtectedRoute>
                         <Profile />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/users/:id",
+                element: (
+                    <ProtectedRoute>
+                        <Users />
                     </ProtectedRoute>
                 ),
             },

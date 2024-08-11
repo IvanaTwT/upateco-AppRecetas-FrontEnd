@@ -2,8 +2,10 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import Ingrediente from "../ingredientes/Ingrediente";
-import Category from "../categorias/Category";
+// import Ingrediente from "../ingredientes/Ingrediente";
+// import Category from "../categorias/Category";
+import Ingrediente from "../Ingredientes/Ingrediente";
+import Category from "../Categorias/Category";
 import Paso from "../pasos/Paso";
 
 export default function RecetaForm() {

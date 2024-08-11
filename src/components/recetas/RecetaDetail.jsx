@@ -134,7 +134,7 @@ export default function RecetaDetail() {
                                         <p>
                                             <strong>Autor: </strong>
                                             <NavLink
-                                                to={`../../profile/${receta.owner}`}
+                                                to={`../../users/${receta.owner}`}
                                                 relative="path"
                                             >
                                                 <User id={receta.owner} />

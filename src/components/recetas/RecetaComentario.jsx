@@ -105,7 +105,7 @@ export default function RecetaComentario({ receta }) {
 
                             <div className="media-content">
                                 <p className="title is-6">
-                                    <NavLink to={`../../profile/${comentario.author}`} relative="path">
+                                    <NavLink to={`../../users/${comentario.author}`} relative="path">
                                         <User id={comentario.author} />
                                     </NavLink>
                                 </p>
