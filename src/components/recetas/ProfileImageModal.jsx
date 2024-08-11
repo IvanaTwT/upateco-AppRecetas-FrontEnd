@@ -57,7 +57,7 @@ function ProfileImageModal({ isOpen, onClose, userId, onUpload }) {
                         <button
                             className="button is-primary"
                             type="submit"
-                            disabled={onUpload.isLoadingUpdate}
+                            // disabled={onUpload.isLoadingUpdate}
                         >
                             {onUpload.isLoadingUpdate ? "Subiendo..." : "Subir"}
                         </button>
