@@ -140,7 +140,7 @@ export default function Ingrediente({
     }
     
     return (
-        <div className="container is-flex is-flex-direction-column">
+        <div className="">
             <div className="is-flex is-flex-direction-row is-justify-content-space-between">
                 <label className="label has-text-white">Ingredientes</label>
                 <p
@@ -175,8 +175,16 @@ export default function Ingrediente({
                                       onChange={handleIngEditChange}
                                       required
                                   />
+                                  {/* <div className="select mr-1">
+                            <select
+                                name="measure"
+                                defaultValue={ingrediente.measure}
+                                onChange={handleIngredientChange}
+                            >
+                                <option value="">Seleccione una medida</option> */}
+                                 <div className="select mr-1">
                                   <select
-                                      className="m-1"
+                                      className=""
                                       name="measure"
                                       defaultValue={ing.measure}
                                       onChange={handleIngEditChange}
@@ -190,6 +198,7 @@ export default function Ingrediente({
                                           </option>
                                       ))}
                                   </select>
+                                </div>   
                                   <p
                                       onClick={() => handleOnClickEditIng(ing.id)}
                                       className="button is-info mr-1"
@@ -220,30 +229,30 @@ export default function Ingrediente({
                               <input
                                   className="input mr-1"
                                   type="text"
-                                  value={i.name}
+                                  defaultValue={i.name}
                               />
                               <input
                                   className="input mr-1"
                                   type="numer"
-                                  value={i.quantity}
+                                  defaultValue={i.quantity}
                               />
                               <input
                                   className="input"
                                   type="text"
-                                  value={i.measure}
+                                  defaultValue={i.measure}
                               />
                           </div>
                       ))
                     : null}
             </div>
             {formIngredient ? (
-                <form className="form-ingredient" >
+                <div className="form-ingredient" >
                     <div className="is-flex is-flex-direction-row m-1">
                         <input
                             className="input mr-1"
                             type="text"
                             name="name"
-                            value={ingrediente.name}
+                            defaultValue={ingrediente.name}
                             onChange={handleIngredientChange}
                             placeholder="Nombre"
                         />
@@ -252,14 +261,14 @@ export default function Ingrediente({
                             type="number"
                             min="1"
                             name="quantity"
-                            value={ingrediente.quantity}
+                            defaultValue={ingrediente.quantity}
                             onChange={handleIngredientChange}
                             placeholder="Cantidad"
                         />
                         <div className="select mr-1">
                             <select
                                 name="measure"
-                                value={ingrediente.measure}
+                                defaultValue={ingrediente.measure}
                                 onChange={handleIngredientChange}
                             >
                                 <option value="">Seleccione una medida</option>
@@ -278,7 +287,7 @@ export default function Ingrediente({
                             Agregar
                         </button>
                     </div>
-                </form>
+                </div>
             ) : null}
         </div>
     );

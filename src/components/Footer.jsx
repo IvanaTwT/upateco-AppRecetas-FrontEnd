@@ -3,7 +3,7 @@ import "/src/assets/css/style.css";
 export default function Footer() {
     return (
         // style={{magin:"0", padding:"0"}}
-        <footer className="footer custom "
+        <footer className="footer"
             style={{background:"#d66d75", 
             background: "-webkit-linear-gradient(to right, #d66d75, #e29587)",
             background: "linear-gradient(to right, #d66d75, #e29587)"}}  >

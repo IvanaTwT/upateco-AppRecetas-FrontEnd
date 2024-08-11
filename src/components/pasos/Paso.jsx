@@ -105,7 +105,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
     }
 
     return (
-        <div className="container is-flex is-flex-direction-column">
+        <div className="">
             <div className="is-flex is-flex-direction-row is-justify-content-space-between mb-1">
                 <label className="label has-text-white">Preparación: </label>
                 <p
@@ -129,6 +129,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
                                       type="number"
                                       name="order"
                                       value={step.order}
+                                      readOnly
                                       style={{width:"5em"}}
                                     //   onChange={handleStepEditChange}
                                     //   required
@@ -179,7 +180,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
                                     <input
                                         className="input column"
                                         type="text"
-                                        value={p.instruction}
+                                        defaultValue={p.instruction}
                                         readOnly
                                     />
                                 {/* </div> */}
@@ -189,7 +190,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
                 )}
             </div>
             {formPaso ? (
-                <form className="form-ingredient mb-1" >
+                <div className="form mb-1" >
                     <div className="columns ">
                         <div className="control column is-narrow" style={{width:"5em"}}>
                             <input
@@ -197,7 +198,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
                                     type="number"
                                     min="1"
                                     name="order"
-                                    value={orden}
+                                    defaultValue={orden}
                                     readOnly
                             />
                         </div>
@@ -206,7 +207,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
                                 className="input m-1"
                                 id="instruction"
                                 name="instruction"
-                                value={paso.instruction}
+                                defaultValue={paso.instruction}
                                 // defaultValue={paso.instruction}
                                 onChange={handleStepChange}
                                 placeholder="instruction"
@@ -223,7 +224,7 @@ export default function Paso({addStep, paginaEdit, editStepInitial,deleteStep}) 
                             Agregar
                         </button></div>
                     </div>
-                </form>
+                </div>
             ) : null}
         </div>
     );

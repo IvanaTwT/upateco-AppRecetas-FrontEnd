@@ -10,6 +10,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Login from "../components/Auth/Login";
 import RecetasMias from "../components/recetas/RecetasMias"
 import Users from "../components/recetas/Users";
+import NotFound from "../components/NotFound";
 
 const Router = createBrowserRouter([
     {
@@ -97,7 +98,7 @@ const Router = createBrowserRouter([
             },
             {
                 path: "*",
-                element: <h1 className="title is-3">Not Found</h1>,
+                element: <NotFound></NotFound>,
             },
         ],
     },

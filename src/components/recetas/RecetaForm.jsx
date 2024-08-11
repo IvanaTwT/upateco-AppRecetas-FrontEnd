@@ -2,10 +2,8 @@ import useFetch from "../hooks/useFetch";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-// import Ingrediente from "../ingredientes/Ingrediente";
-// import Category from "../categorias/Category";
-import Ingrediente from "../Ingredientes/Ingrediente";
-import Category from "../Categorias/Category";
+import Ingrediente from "../ingredientes/Ingrediente";
+import Category from "../categorias/Category";
 import Paso from "../pasos/Paso";
 
 export default function RecetaForm() {
@@ -46,8 +44,10 @@ export default function RecetaForm() {
     const [recipeCat, setRecipeCat]=useState([])
 
     useEffect(() => {
-        doFetch();
-    }, []);
+        if(id){
+            doFetch();
+        }
+    }, [id]);
 
     const [
         { data: dataPost, isError: isErrorPost, isLoading: isLoadingPost },
@@ -96,7 +96,7 @@ export default function RecetaForm() {
     );
 
     useEffect(() => {
-        if (data && window.location.pathname !== "/recetas/new") {
+        if (data && window.location.pathname !== "/recetas/new" && id) {
             setRecipe({
                 title: data.title || "",
                 description: data.description || "",
@@ -104,19 +104,19 @@ export default function RecetaForm() {
                 cooking_time: parseInt(data.cooking_time) || 0,
                 servings: parseInt(data.servings) || null,
             });
-            setPagEdit(!paginaEdit);
+            setPagEdit(true);
             setImage(data.image);
             setCategorias(data.categories);
         }
-    }, [data]);
-
+    }, [data, id]);
+    
     //traer todos los ingredientes
-    useEffect(()=>{
+    useEffect(() => {
         doFetchIngredient();
-    },[page])
-
+        
+    }, [page]);
     useEffect(() => {        
-        if(id && dataIngredient){
+        if(dataIngredient){
             const list=dataIngredient.results
             setAllIng((prevLista) => [...prevLista, ...list]);
             
@@ -124,11 +124,13 @@ export default function RecetaForm() {
                 setPage((prevPage) => prevPage + 1)
             }
         }
-    }, [id]);
+    }, [dataIngredient]);
     //traer las categorias relacionadas a esta receta
-    useEffect(()=>{
-        doFetchRecipeCategory();
-    },[pageCat])
+    useEffect(() => {
+        if (id) {
+            doFetchRecipeCategory();
+        }
+    }, [pageCat, id]);
 
     useEffect(() => {        
         if(id && dataRecipeCategory){
@@ -140,8 +142,7 @@ export default function RecetaForm() {
                 setPageCat((prevPage) => prevPage + 1)
             }
         }
-    }, [id]);
-
+    }, [id, dataRecipeCategory]);
     useEffect(() => {
         if (formCargado && allIng && recipeCat) {
             const newForm = new FormData();
@@ -167,11 +168,11 @@ export default function RecetaForm() {
     }, [formCargado, recipe, image, ingredientes, categorias, allIng, recipeCat]);
 
     useEffect(() => {
-        if (!isErrorPut && formCargado && paginaEdit && allIng && recipeCat) {
+        if (!isErrorPut && formCargado && paginaEdit && allIng && recipeCat && id) {
             console.log("Size all ing: "+allIng.length) //obtener el ultimo cambio de las categorias select
             // console.log("Cate:"+categorias)
             //array=[ [ {},{} ] , [ {},{} ] ]
-            if (ingredientes.length > 0) {
+            if (ingredientes.length > 0 ) {
                 //ingredientes agregados
                 ingredientes.forEach((ingredient) => {
                     
@@ -595,16 +596,13 @@ export default function RecetaForm() {
                         );
                 });
             }
-            //cargar categorias
-            const listCate = categorias[categorias.length - 1];
-            console.log("lc"+listCate)
-            let tipoList=String(typeof listCate) 
-            console.log(tipoList)
             //si es lista, deberemos de cambiar la categoria/s, de lo contrario el usu no actualizo apartado categories
-            if (categorias.length > 0 && (tipoList==='object' )) {
+            const ultimoElemento=categorias[categorias.length - 1]
+            console.log((typeof ultimoElemento) !== ( typeof 1))
+            if ((typeof ultimoElemento) !== ( typeof 1)) {
                  //trae el ultimo par de objetos en una lista
                 //si el usuario no hizo nuevamenete una seleccion,solo tiene numeros porque es la inicial, ids
-                listCate.forEach((category) => {
+                categorias.forEach((category) => {
                     // console.log(category) // object
                     fetch(
                         `${import.meta.env.VITE_API_BASE_URL}/reciperover/recipe-categories/`,
@@ -626,54 +624,25 @@ export default function RecetaForm() {
                         }
                     }).catch(error => console.error("Error en la petición:", error));
                 });
-            }else{
-                //eliminamos las categorias que existen
-                console.log("Size (RC): "+recipeCat.length)
-                if(recipeCat){
-                    recipeCat.map((rp) => {
-                        fetch(
-                            `${
-                                import.meta.env.VITE_API_BASE_URL
-                            }/reciperover/recipe-categories/${rp.id}/`,
-                            {
-                                method: "DELETE",
-                                headers: {
-                                    Authorization: `Token ${token}`,
-                                },
-                            }
-                        )
-                            .then((response) => {
-                                if (!response.ok) {
-                                    throw new Error(
-                                        `HTTP error! Status: ${response.status}`
-                                    );
-                                }
-                                console.log("Categoria Eliminada");
-                            })
-                            .catch((error) =>
-                                console.error("Error en la petición:", error)
-                            );
-                    })
-                }
             }
             return navigate(`/recetas/${id}`);
         }
-    }, [
+    }, 
+    [   id,
         formCargado,
         paginaEdit,
         dataPut,
         ingredientes,
         ingInitial,
         steps,
-        categorias
+        categorias,
+        navigate
     ]);
 
     useEffect(() => {
-        if (dataPost) {
-            console.log("Nueva receta creada con ID:", dataPost.id); // ID de la NUEVA RECETA
-            setCategorias(categorias[categorias.length - 1]); //el ultimo cambio de categoria
-            console.log("Categorias reset: " + categorias);
-            if (ingredientes.length > 0) {
+        if (dataPost ) {
+            //console.log("Nueva receta creada con ID:", dataPost.id); // ID de la NUEVA RECETA
+            if (ingredientes.length > 0 && allIng.length>0) {
                 ingredientes.forEach((ingredient) => {
                     // Buscar ingrediente en la base de datos antes de crearlo
                     const existingIngredient = allIng.find(
@@ -681,9 +650,10 @@ export default function RecetaForm() {
                             item.name.toLowerCase() ===
                             ingredient.name.toLowerCase()
                     );
-                    // console.log("Existe? "+existingIngredient);
+                    // console.log("Existe?"+existingIngredient);
                     if (existingIngredient) {
                         // Si el ingrediente existe, asociarlo a la receta
+                        // console.log("Existe? "+existingIngredient.id)
                         fetch(
                             `${
                                 import.meta.env.VITE_API_BASE_URL
@@ -721,6 +691,7 @@ export default function RecetaForm() {
                             );
                     } else {
                         // Si el ingrediente no existe, crearlo y luego asociarlo a la receta
+                        // console.log("No existe "+ingredient.name)
                         fetch(
                             `${
                                 import.meta.env.VITE_API_BASE_URL
@@ -737,8 +708,8 @@ export default function RecetaForm() {
                             }
                         )
                             .then((response) => response.json())
-                            .then((data) => {
-                                if (data.id) {
+                            .then((newIngredient) => {
+                                if (newIngredient.id) {
                                     fetch(
                                         `${
                                             import.meta.env.VITE_API_BASE_URL
@@ -754,21 +725,21 @@ export default function RecetaForm() {
                                                 quantity: ingredient.quantity,
                                                 measure: ingredient.measure,
                                                 recipe: dataPost.id,
-                                                ingredient: data.id,
+                                                ingredient: newIngredient.id,
                                             }),
                                         }
                                     )
                                         .then((response) => response.json())
-                                        .then((data) => {
-                                            if (!data.id) {
+                                        .then((dataNewIng) => {
+                                            if (!dataNewIng.id) {
                                                 console.error(
                                                     "Error al asociar el nuevo ingrediente:",
-                                                    data
+                                                    dataNewIng
                                                 );
                                             } else {
                                                 console.log(
                                                     "Nuevo ingrediente asociado:",
-                                                    data
+                                                    dataNewIng
                                                 );
                                             }
                                         })
@@ -781,7 +752,7 @@ export default function RecetaForm() {
                                 } else {
                                     console.error(
                                         "Error al crear el ingrediente:",
-                                        data
+                                        ingredient
                                     );
                                 }
                             })
@@ -792,7 +763,9 @@ export default function RecetaForm() {
                 });
             }
             if (steps.length > 0) {
+                console.log("Pasos a agregar:")
                 steps.forEach((paso) => {
+                    // console.log(paso.order + ": "+paso.instruction)
                     fetch(
                         `${
                             import.meta.env.VITE_API_BASE_URL
@@ -811,11 +784,11 @@ export default function RecetaForm() {
                         }
                     )
                         .then((response) => response.json())
-                        .then((data) => {
-                            if (!data.id) {
+                        .then((dataStep) => {
+                            if (!dataStep.id) {
                                 console.error(
                                     "Error en la creación de la step:",
-                                    data
+                                    dataStep
                                 );
                             }
                         })
@@ -824,8 +797,10 @@ export default function RecetaForm() {
                         );
                 });
             }
-            if (categorias.length > 0 && categorias.length > 2) {
+            if (categorias.length > 0) {
+                console.log("Categorias a agregar: ")
                 categorias.forEach((category) => {
+                    console.log(category+": ")
                     fetch(
                         `${
                             import.meta.env.VITE_API_BASE_URL
@@ -843,11 +818,11 @@ export default function RecetaForm() {
                         }
                     )
                         .then((response) => response.json())
-                        .then((data) => {
-                            if (!data.id) {
+                        .then((dataCategory) => {
+                            if (!dataCategory.id) {
                                 console.error(
                                     "Error en la creación de la categoría:",
-                                    data
+                                    dataCategory
                                 );
                             }
                         })
@@ -856,8 +831,10 @@ export default function RecetaForm() {
                         );
                 });
             }
+            
+            navigate(`/recetas/${dataPost.id}`)
         }
-    }, [dataPost, allIng]);
+    }, [formCargado,dataPost, allIng, categorias, steps, ingredientes, navigate]);
 
     // INGREDIENTE - funcion para agregar ingrediente cada vez
     function addIngrediente(ingrediente) {
@@ -876,13 +853,9 @@ export default function RecetaForm() {
         // console.log("Eliminando ingrediente id: "+idEliminado)
         setIngDelete([...ingredientDelete, idEliminado]);
     }
-    // funcion para eliminar ingrediente
+    // funcion para agregar categorias
     function addCategorias(categoria) {
-        setCategorias([...categorias, categoria]);
-    }
-    function editCategories() {
-        setCategorias(categorias[categorias.length - 1]); //el ultimo cambio de categoria
-        return categorias;
+        setCategorias([...categoria]);
     }
 
     // PASO - funcion para agregar paso cada vez
@@ -900,10 +873,6 @@ export default function RecetaForm() {
         console.log("step elimninado (RF) : " + idEliminado);
         setStepDelete((prevStep) => [...prevStep, idEliminado]);
     }
-
-    if (isLoading) return <p>Cargando...</p>;
-    if (isError) return <p>Error al cargar las recetas.</p>;
-    if (!data) return <p>No hay recetas disponibles</p>;
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -926,20 +895,24 @@ export default function RecetaForm() {
             event.preventDefault();
         }
     }
+    if(id){
+        if (isLoading) return <p>Cargando...</p>;
+        if (isError) return <p>Error al cargar las recetas.</p>;
+        if (!data) return <p>No hay recetas disponibles</p>;
+    }
     return (
-        <section className="">
+        <section className="columns has-background-dark is-centered m-0 ">
             <form
                 onSubmit={handleSubmit}
                 onKeyDown={handleKeyDown}
-                className=" is-flex is-flex-direction-column box m-4 p-4 has-background-dark"
+                className="column is-6"
             >
                 <div className="columns is-centered">
                     {paginaEdit ? (
-                        <figure className="column is-one-third">
+                        <figure className="column is-one-third-mobile is-one-third-tablet">
                             <img
                                 src={image}
                                 alt={recipe.title}
-                                className="is-128x128"
                             />
                         </figure>
                     ) : null}
@@ -1058,7 +1031,7 @@ export default function RecetaForm() {
                     ></Ingrediente>
                 </div>
 
-                <div className="pasos">
+                <div className="pasos mt-1">
                     <Paso
                         addStep={addStep}
                         editStepInitial={editStepInitial}
@@ -1072,7 +1045,6 @@ export default function RecetaForm() {
                         receta={data}
                         addCategorias={addCategorias}
                         paginaEdit={paginaEdit}
-                        editCategoria={editCategories}
                     ></Category>
                 </div>
                 <div className="field">
