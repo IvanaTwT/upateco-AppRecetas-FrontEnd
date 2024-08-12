@@ -114,7 +114,7 @@ export default function Home() {
                             <div>
                                 <img
                                     className="background-image"
-                                    src="src/components/fondo.jpg"
+                                    src="/fondo.jpg"
                                     alt=""
                                 />
                             </div>

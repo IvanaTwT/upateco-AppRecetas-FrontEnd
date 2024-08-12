@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useFetch from "./hooks/useFetch";
 import { useNavigate } from "react-router-dom";
+import defaultCategoryImage from "/logo.png";
 
 export default function HomeCategory() {
     //get id y nombre, 
@@ -44,8 +45,11 @@ export default function HomeCategory() {
                                 <img
                                     // className="is-rounded"
                                     style={{borderRadius:"50%"}}
-                                    src={`src/assets/img/${cat.name.toLowerCase()}.jpg`}
-                                    alt="Rounded image"
+                                    src={`/${cat.name.toLowerCase()}.jpg`}
+                                    alt=""
+                                    onError={(e) => {
+                                        e.target.src = defaultCategoryImage;
+                                    }}
                                 />
                             </figure>
                         </div>
