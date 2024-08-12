@@ -111,28 +111,33 @@ export default function Home() {
                 <div className="column is-full">
                     <div className="box">
                         <div className="search-container">
-                            <div>
-                                <img
-                                    className="background-image"
-                                    src="/fondo.jpg"
-                                    alt=""
-                                />
+                            <div
+                                className="background-image-container"
+                                style={{
+                                    backgroundImage: 'url(/fondo.jpg)',
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    backgroundRepeat: 'no-repeat',
+                                    width: '100%',
+                                    height: '100%',
+                                }}
+                            >
                             </div>
 
                             <div className="">
                                 <div
                                     className="box search-box"
-                                    style={{ width: "500px" }}
+                                    style={{ width: "100%", maxWidth: "500px" }}
                                 >
                                     <h2 className="title">
                                         ¿Qué te gustaría cocinar?
                                     </h2>
                                     <form className="" onSubmit={handleSearch}>
-                                        <div className="is-flex is-align-items-center is-justify-content-center field has-addons">
+                                        <div className="field has-addons is-flex is-align-items-center is-justify-content-center">
                                             <div className="control is-expanded">
                                                 {/* is-expanded */}
                                                 <input
-                                                    className="input button input-image"
+                                                    className="input button input-image is-fullwidth"
                                                     type="text"
                                                     name="title"
                                                     placeholder="Buscar..."
